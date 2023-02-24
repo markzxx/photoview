@@ -4,7 +4,7 @@ import Routes from './components/routes/Routes'
 import Messages from './components/messages/Messages'
 import { useTranslation } from 'react-i18next'
 import { loadTranslations } from './localization'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 
 const App = () => {
   const { t } = useTranslation()

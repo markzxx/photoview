@@ -13,8 +13,8 @@ export function setupLocalization(): void {
   i18n
     .use(initReactI18next)
     .init({
-      lng: 'en',
-      fallbackLng: 'en',
+      lng: 'zh-CN',
+      fallbackLng: 'zh-CN',
       returnNull: false,
       returnEmptyString: false,
 
