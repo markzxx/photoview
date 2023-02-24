@@ -6,7 +6,6 @@ import styled from 'styled-components'
 import { authToken } from '../../../helpers/authentication'
 import { isNil } from '../../../helpers/utils'
 import { MediaType } from '../../../__generated__/globalTypes'
-import { SidebarFacesOverlay } from '../../facesOverlay/FacesOverlay'
 import { SidebarContext } from '../Sidebar'
 import {
   ProtectedImage,
@@ -19,8 +18,6 @@ import SidebarMediaDownload from '../SidebarDownloadMedia'
 import SidebarHeader from '../SidebarHeader'
 import { sidebarDownloadQuery_media_downloads } from '../__generated__/sidebarDownloadQuery'
 import ExifDetails from './MediaSidebarExif'
-import MediaSidebarPeople from './MediaSidebarPeople'
-import MediaSidebarMap from './MediaSidebarMap'
 import {
   sidebarMediaQuery,
   sidebarMediaQueryVariables,

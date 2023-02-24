@@ -4,7 +4,7 @@ import Checkbox from '../../../primitives/form/Checkbox'
 import { Button } from '../../../primitives/form/Input'
 import Modal from '../../../primitives/Modal'
 import { TableCell, TableRow } from '../../../primitives/Table'
-import ChangePasswordModal from './UserChangePassword'
+// import ChangePasswordModal from './UserChangePassword'
 import { UserRowChildProps } from './UserRow'
 
 const ViewUserRow = ({
@@ -13,10 +13,10 @@ const ViewUserRow = ({
   setState,
   scanUser,
   deleteUser,
-  setChangePassword,
+  // setChangePassword,
   setConfirmDelete,
   scanUserCalled,
-  showChangePassword,
+  // showChangePassword,
   showConfirmDelete,
 }: UserRowChildProps) => {
   const { t } = useTranslation()
@@ -54,17 +54,17 @@ const ViewUserRow = ({
           >
             {t('settings.users.table.row.action.scan', 'Scan')}
           </Button>
-          <Button onClick={() => setChangePassword(true)}>
-            {t(
-              'settings.users.table.row.action.change_password',
-              'Change password'
-            )}
-          </Button>
-          <ChangePasswordModal
-            user={user}
-            open={showChangePassword}
-            onClose={() => setChangePassword(false)}
-          />
+          {/*<Button onClick={() => setChangePassword(true)}>*/}
+          {/*  {t(*/}
+          {/*    'settings.users.table.row.action.change_password',*/}
+          {/*    'Change password'*/}
+          {/*  )}*/}
+          {/*</Button>*/}
+          {/*<ChangePasswordModal*/}
+          {/*  user={user}*/}
+          {/*  open={showChangePassword}*/}
+          {/*  onClose={() => setChangePassword(false)}*/}
+          {/*/>*/}
           <Button
             variant="negative"
             onClick={() => {
@@ -73,47 +73,47 @@ const ViewUserRow = ({
           >
             {t('settings.users.table.row.action.delete', 'Delete')}
           </Button>
-          <Modal
-            open={showConfirmDelete}
-            onClose={() => setConfirmDelete(false)}
-            title={t('settings.users.confirm_delete_user.title', 'Delete user')}
-            actions={[
-              {
-                key: 'cancel',
-                label: t('general.action.cancel', 'Cancel'),
-                onClick: () => setConfirmDelete(false),
-              },
-              {
-                key: 'delete',
-                label: t(
-                  'settings.users.confirm_delete_user.action',
-                  'Delete {{user}}',
-                  { user: user.username }
-                ),
-                onClick: () => {
-                  setConfirmDelete(false)
-                  deleteUser({
-                    variables: {
-                      id: user.id,
-                    },
-                  })
-                },
-                variant: 'negative',
-              },
-            ]}
-            description={
-              <Trans
-                t={t}
-                i18nKey="settings.users.confirm_delete_user.description"
-              >
-                <p>
-                  {`Are you sure, you want to delete `}
-                  <b>{user.username}</b>?
-                </p>
-                <p>{`This action cannot be undone`}</p>
-              </Trans>
-            }
-          />
+          {/*<Modal*/}
+          {/*  open={showConfirmDelete}*/}
+          {/*  onClose={() => setConfirmDelete(false)}*/}
+          {/*  title={t('settings.users.confirm_delete_user.title', 'Delete user')}*/}
+          {/*  actions={[*/}
+          {/*    {*/}
+          {/*      key: 'cancel',*/}
+          {/*      label: t('general.action.cancel', 'Cancel'),*/}
+          {/*      onClick: () => setConfirmDelete(false),*/}
+          {/*    },*/}
+          {/*    {*/}
+          {/*      key: 'delete',*/}
+          {/*      label: t(*/}
+          {/*        'settings.users.confirm_delete_user.action',*/}
+          {/*        'Delete {{user}}',*/}
+          {/*        { user: user.username }*/}
+          {/*      ),*/}
+          {/*      onClick: () => {*/}
+          {/*        setConfirmDelete(false)*/}
+          {/*        deleteUser({*/}
+          {/*          variables: {*/}
+          {/*            id: user.id,*/}
+          {/*          },*/}
+          {/*        })*/}
+          {/*      },*/}
+          {/*      variant: 'negative',*/}
+          {/*    },*/}
+          {/*  ]}*/}
+          {/*  description={*/}
+          {/*    <Trans*/}
+          {/*      t={t}*/}
+          {/*      i18nKey="settings.users.confirm_delete_user.description"*/}
+          {/*    >*/}
+          {/*      <p>*/}
+          {/*        {`Are you sure, you want to delete `}*/}
+          {/*        <b>{user.username}</b>?*/}
+          {/*      </p>*/}
+          {/*      <p>{`This action cannot be undone`}</p>*/}
+          {/*    </Trans>*/}
+          {/*  }*/}
+          {/*/>*/}
         </div>
       </TableCell>
     </TableRow>

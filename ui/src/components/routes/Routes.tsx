@@ -17,36 +17,14 @@ const AlbumsPage = React.lazy(
   () => import('../../Pages/AllAlbumsPage/AlbumsPage')
 )
 const AlbumPage = React.lazy(() => import('../../Pages/AlbumPage/AlbumPage'))
-const TimelinePage = React.lazy(
-  () => import('../../Pages/TimelinePage/TimelinePage')
-)
-const PlacesPage = React.lazy(() => import('../../Pages/PlacesPage/PlacesPage'))
 
 const LoginPage = React.lazy(() => import('../../Pages/LoginPage/LoginPage'))
 const InitialSetupPage = React.lazy(
   () => import('../../Pages/LoginPage/InitialSetupPage')
 )
 
-const SharePageTokenRoute = React.lazy(() =>
-  import('../../Pages/SharePage/SharePage').then(x => ({
-    default: x.TokenRoute,
-  }))
-)
-
 const SettingsPage = React.lazy(
   () => import('../../Pages/SettingsPage/SettingsPage')
-)
-
-const PeoplePage = React.lazy(() =>
-  import('../../Pages/PeoplePage/PeoplePage').then(x => ({
-    default: x.PeoplePage,
-  }))
-)
-
-const PersonPage = React.lazy(() =>
-  import('../../Pages/PeoplePage/PeoplePage').then(x => ({
-    default: x.PersonPage,
-  }))
 )
 
 const Routes = () => {
@@ -75,10 +53,6 @@ const Routes = () => {
       element: <InitialSetupPage />,
     },
     {
-      path: '/share/:token/*',
-      element: <SharePageTokenRoute />,
-    },
-    {
       path: '/albums',
       element: authorized(<AlbumsPage />),
     },
@@ -87,35 +61,8 @@ const Routes = () => {
       element: authorized(<AlbumPage />),
     },
     {
-      path: '/timeline',
-      element: authorized(<TimelinePage />),
-    },
-    {
-      path: '/places',
-      element: authorized(<PlacesPage />),
-    },
-    {
       path: '/settings',
       element: authorized(<SettingsPage />),
-    },
-    {
-      path: '/people',
-      element: authorized(<Outlet />),
-      children: [
-        {
-          path: ':person',
-          element: <PersonPage />,
-        },
-        {
-          index: true,
-          element: <PeoplePage />,
-        },
-      ],
-    },
-    {
-      // for backwards-compatibility
-      path: '/photos',
-      element: <Navigate to="/timeline" />,
     },
     {
       path: '*',
@@ -139,7 +86,7 @@ const Routes = () => {
 const IndexPage = () => {
   const token = authToken()
 
-  const dest = token ? '/timeline' : '/login'
+  const dest = token ? '/albums' : '/login'
 
   return <Navigate to={dest} />
 }
