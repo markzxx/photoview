@@ -6,7 +6,7 @@ import { authToken } from '../../helpers/authentication'
 
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { TextField } from '../../primitives/form/Input'
 import MessageBox from '../../primitives/form/MessageBox'
 import { CheckInitialSetup } from './__generated__/CheckInitialSetup'

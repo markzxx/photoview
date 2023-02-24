@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { MockedProvider } from '@apollo/client/testing'
 import MediaSidebar, { MediaSidebarMedia } from './MediaSidebar'
 import { MediaType } from '../../../__generated__/globalTypes'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 
 import * as authentication from '../../../helpers/authentication'
 
