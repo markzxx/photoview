@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [react(), svgr()],
   envPrefix: ['VITE_', 'REACT_APP_'],
   server: {
-	  host:'172.19.209.69',
+	  host:'0.0.0.0',
 	  port: 1234,
   },
   esbuild: {
