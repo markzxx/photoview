@@ -34,8 +34,6 @@ const initialSetupMutation = gql`
 `
 
 type InitialSetupFormData = {
-  username: string
-  password: string
   rootPath: string
 }
 
@@ -75,8 +73,8 @@ const InitialSetupPage = () => {
   const signIn = handleSubmit(data => {
     authorize({
       variables: {
-        username: data.username,
-        password: data.password,
+        username: "admin",
+        password: "admin",
         rootPath: data.rootPath,
       },
     })
@@ -98,28 +96,6 @@ const InitialSetupPage = () => {
           {t('login_page.initial_setup.title', 'Initial Setup')}
         </h1>
         <form onSubmit={signIn} className="max-w-[500px] mx-auto">
-          <TextField
-            wrapperClassName="my-4"
-            fullWidth
-            {...register('username', { required: true })}
-            label={t('login_page.field.username', 'Username')}
-            error={
-              formErrors.username?.type == 'required'
-                ? 'Please enter a username'
-                : undefined
-            }
-          />
-          <TextField
-            wrapperClassName="my-4"
-            fullWidth
-            {...register('password', { required: true })}
-            label={t('login_page.field.password', 'Password')}
-            error={
-              formErrors.password?.type == 'required'
-                ? 'Please enter a password'
-                : undefined
-            }
-          />
           <TextField
             wrapperClassName="my-4"
             fullWidth
