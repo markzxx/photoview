@@ -17,6 +17,8 @@ import (
 func GraphqlEndpoint(db *gorm.DB) *graphql_handler.Server {
 	graphqlResolver := resolvers.NewRootResolver(db)
 	graphqlDirective := photoview_graphql.DirectiveRoot{}
+	graphqlDirective.IsAdmin = photoview_graphql.IsAdmin
+	graphqlDirective.IsAuthorized = photoview_graphql.IsAuthorized
 
 	graphqlConfig := photoview_graphql.Config{
 		Resolvers:  &graphqlResolver,

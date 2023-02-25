@@ -1,3 +1,6 @@
+directive @isAuthorized on FIELD_DEFINITION
+directive @isAdmin on FIELD_DEFINITION
+
 scalar Time
 scalar Any
 
@@ -34,12 +37,12 @@ type Query {
   siteInfo: SiteInfo!
 
   "List of registered users, must be admin to call"
-  user(order: Ordering, paginate: Pagination): [User!]!
+  user(order: Ordering, paginate: Pagination): [User!]! @isAdmin
   "Information about the currently logged in user"
-  myUser: User!
+  myUser: User! @isAuthorized
 
   "User preferences for the logged in user"
-  myUserPreferences: UserPreferences!
+  myUserPreferences: UserPreferences! @isAuthorized
 
   "List of albums owned by the logged in user."
   myAlbums(
@@ -51,7 +54,7 @@ type Query {
     showEmpty: Boolean
     "Show only albums having favorites"
     onlyWithFavorites: Boolean
-  ): [Album!]!
+  ): [Album!]! @isAuthorized
   """
   Get album by id, user must own the album or be admin
   If valid tokenCredentials are provided, the album may be retrived without further authentication
@@ -59,7 +62,7 @@ type Query {
   album(id: ID!, tokenCredentials: ShareTokenCredentials): Album!
 
   "List of media owned by the logged in user"
-  myMedia(order: Ordering, paginate: Pagination): [Media!]!
+  myMedia(order: Ordering, paginate: Pagination): [Media!]! @isAuthorized
   """
   Get media by id, user must own the media or be admin.
   If valid tokenCredentials are provided, the media may be retrived without further authentication
@@ -77,10 +80,10 @@ type Query {
     onlyFavorites: Boolean,
     "Only fetch media that is older than this date"
     fromDate: Time
-  ): [Media!]!
+  ): [Media!]! @isAuthorized
 
   "Get media owned by the logged in user, returned in GeoJson format"
-  myMediaGeoJson: Any!
+  myMediaGeoJson: Any! @isAuthorized
   "Get the mapbox api token, returns null if mapbox is not enabled"
   mapboxToken: String
 
@@ -93,9 +96,9 @@ type Query {
   search(query: String!, limitMedia: Int, limitAlbums: Int): SearchResult!
 
   "Get a list of `FaceGroup`s for the logged in user"
-  myFaceGroups(paginate: Pagination): [FaceGroup!]!
+  myFaceGroups(paginate: Pagination): [FaceGroup!]! @isAuthorized
   "Get a particular `FaceGroup` specified by its ID"
-  faceGroup(id: ID!): FaceGroup!
+  faceGroup(id: ID!): FaceGroup! @isAuthorized
 }
 
 type Mutation {
@@ -110,24 +113,24 @@ type Mutation {
   ): AuthorizeResult
 
   "Scan all users for new media"
-  scanAll: ScannerResult!
+  scanAll: ScannerResult! @isAdmin
   "Scan a single user for new media"
-  scanUser(userId: ID!): ScannerResult!
+  scanUser(userId: ID!): ScannerResult! @isAdmin
 
   "Generate share token for album"
-  shareAlbum(albumId: ID!, expire: Time, password: String): ShareToken!
+  shareAlbum(albumId: ID!, expire: Time, password: String): ShareToken! @isAuthorized
   "Generate share token for media"
-  shareMedia(mediaId: ID!, expire: Time, password: String): ShareToken!
+  shareMedia(mediaId: ID!, expire: Time, password: String): ShareToken! @isAuthorized
   "Delete a share token by it's token value"
-  deleteShareToken(token: String!): ShareToken!
+  deleteShareToken(token: String!): ShareToken! @isAuthorized
   "Set a password for a token, if null is passed for the password argument, the password will be cleared"
-  protectShareToken(token: String!, password: String): ShareToken!
+  protectShareToken(token: String!, password: String): ShareToken! @isAuthorized
 
   "Mark or unmark a media as being a favorite"
-  favoriteMedia(mediaId: ID!, favorite: Boolean!): Media!
+  favoriteMedia(mediaId: ID!, favorite: Boolean!): Media! @isAuthorized
 
   "Delete a media from filesystem and database"
-  deleteMedia(mediaId: ID!): Album!
+  deleteMedia(mediaId: ID!): Album! @isAuthorized
 
   "Update a user, fields left as `null` will not be changed"
   updateUser(
@@ -135,55 +138,55 @@ type Mutation {
     username: String
     password: String
     admin: Boolean
-  ): User!
+  ): User! @isAdmin
   "Create a new user"
   createUser(
     username: String!
     password: String
     admin: Boolean!
-  ): User!
+  ): User! @isAdmin
   "Delete an existing user"
-  deleteUser(id: ID!): User!
+  deleteUser(id: ID!): User! @isAdmin
 
   "Add a root path from where to look for media for the given user, specified by their user id."
-  userAddRootPath(id: ID!, rootPath: String!): Album
+  userAddRootPath(id: ID!, rootPath: String!): Album @isAdmin
   """
   Remove a root path from a user, specified by the id of the user and the top album representing the root path.
   This album was returned when creating the path using `userAddRootPath`.
   A list of root paths for a particular user can be retrived from the `User.rootAlbums` path.
   """
-  userRemoveRootAlbum(userId: ID!, albumId: ID!): Album
+  userRemoveRootAlbum(userId: ID!, albumId: ID!): Album @isAdmin
 
   """
   Set how often, in seconds, the server should automatically scan for new media,
   a value of 0 will disable periodic scans
   """
-  setPeriodicScanInterval(interval: Int!): Int!
+  setPeriodicScanInterval(interval: Int!): Int! @isAdmin
 
   "Set max number of concurrent scanner jobs running at once"
-  setScannerConcurrentWorkers(workers: Int!): Int!
+  setScannerConcurrentWorkers(workers: Int!): Int! @isAdmin
 
   "Set the filter to be used when generating thumbnails"
-  setThumbnailDownsampleMethod(method: ThumbnailFilter!): ThumbnailFilter!
+  setThumbnailDownsampleMethod(method: ThumbnailFilter!): ThumbnailFilter! @isAdmin
 
   "Change user preferences for the logged in user"
-  changeUserPreferences(language: String): UserPreferences!
+  changeUserPreferences(language: String): UserPreferences! @isAuthorized
 
   "Reset the assigned cover photo for an album"
-  resetAlbumCover(albumID: ID!): Album!
+  resetAlbumCover(albumID: ID!): Album! @isAuthorized
   "Assign a cover photo to an album"
-  setAlbumCover(coverID: ID!): Album!
+  setAlbumCover(coverID: ID!): Album! @isAuthorized
 
   "Assign a label to a face group, set label to null to remove the current one"
-  setFaceGroupLabel(faceGroupID: ID!, label: String): FaceGroup!
+  setFaceGroupLabel(faceGroupID: ID!, label: String): FaceGroup! @isAuthorized
   "Merge two face groups into a single one, all ImageFaces from source will be moved to destination"
-  combineFaceGroups(destinationFaceGroupID: ID!, sourceFaceGroupID: ID!): FaceGroup!
+  combineFaceGroups(destinationFaceGroupID: ID!, sourceFaceGroupID: ID!): FaceGroup! @isAuthorized
   "Move a list of ImageFaces to another face group"
-  moveImageFaces(imageFaceIDs: [ID!]!, destinationFaceGroupID: ID!): FaceGroup!
+  moveImageFaces(imageFaceIDs: [ID!]!, destinationFaceGroupID: ID!): FaceGroup! @isAuthorized
   "Check all unlabeled faces to see if they match a labeled FaceGroup, and move them if they match"
-  recognizeUnlabeledFaces: [ImageFace!]!
+  recognizeUnlabeledFaces: [ImageFace!]! @isAuthorized
   "Move a list of ImageFaces to a new face group"
-  detachImageFaces(imageFaceIDs: [ID!]!): FaceGroup!
+  detachImageFaces(imageFaceIDs: [ID!]!): FaceGroup! @isAuthorized
 }
 
 type Subscription {
@@ -267,20 +270,20 @@ type SiteInfo {
   "Whether or not face detection is enabled and working"
   faceDetectionEnabled: Boolean!
   "How often automatic scans should be initiated in seconds"
-  periodicScanInterval: Int!
+  periodicScanInterval: Int! @isAdmin
   "How many max concurrent scanner jobs that should run at once"
-  concurrentWorkers: Int!
+  concurrentWorkers: Int! @isAdmin
   "The filter to use when generating thumbnails"
-  thumbnailMethod: ThumbnailFilter!
+  thumbnailMethod: ThumbnailFilter! @isAdmin
 }
 
 type User {
   id: ID!
   username: String!
   "All albums owned by this user"
-  albums: [Album!]!
+  albums: [Album!]! @isAdmin
   "Top level albums owned by this user"
-  rootAlbums: [Album!]!
+  rootAlbums: [Album!]! @isAdmin
   "Whether or not the user has admin privileges"
   admin: Boolean!
 }
