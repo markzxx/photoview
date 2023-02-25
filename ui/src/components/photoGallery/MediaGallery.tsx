@@ -11,8 +11,7 @@ import {
   toggleFavoriteAction,
   useMarkFavoriteMutation,
 } from './photoGalleryMutations'
-import MediaSidebar from '../sidebar/MediaSidebar/MediaSidebar'
-import { SidebarContext } from '../sidebar/Sidebar'
+
 import { gql } from '@apollo/client'
 
 const Gallery = styled.div`
@@ -66,8 +65,6 @@ const MediaGallery = ({ mediaState, dispatchMedia }: MediaGalleryProps) => {
   const { media, activeIndex, presenting } = mediaState
   let active = media[activeIndex]
 
-  const { updateSidebar } = useContext(SidebarContext)
-
   let mediaElements = []
   if (media) {
     mediaElements = media.map((media, index) => {
@@ -78,13 +75,6 @@ const MediaGallery = ({ mediaState, dispatchMedia }: MediaGalleryProps) => {
           key={media.id}
           media={media}
           active={active}
-          selectImage={() => {
-            dispatchMedia({
-              type: 'selectImage',
-              index,
-            })
-            updateSidebar(<MediaSidebar media={mediaState.media[index]} />)
-          }}
           clickFavorite={() => {
             toggleFavoriteAction({
               media,

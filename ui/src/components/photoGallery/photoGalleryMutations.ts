@@ -32,6 +32,7 @@ export const toggleFavoriteAction = ({
       mediaId: media.id,
       favorite: !media.favorite,
     },
+    ignoreResults: true,
     optimisticResponse: {
       favoriteMedia: {
         id: media.id,

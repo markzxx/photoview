@@ -140,7 +140,6 @@ const VideoThumbnailIcon = styled(VideoThumbnailIconSVG)`
 type MediaThumbnailProps = {
   media: MediaGalleryFields
   active: boolean
-  selectImage(): void
   clickPresent(): void
   clickFavorite(): void
 }
@@ -148,7 +147,6 @@ type MediaThumbnailProps = {
 export const MediaThumbnail = ({
   media,
   active,
-  selectImage,
   clickPresent,
   clickFavorite,
 }: MediaThumbnailProps) => {
@@ -163,11 +161,6 @@ export const MediaThumbnail = ({
         }}
       />
     )
-  }
-
-  let videoIcon = null
-  if (media.type == MediaType.Video) {
-    videoIcon = <VideoThumbnailIcon />
   }
 
   let minWidth = 100
@@ -198,13 +191,6 @@ export const MediaThumbnail = ({
         <LazyPhoto src={media.thumbnail?.url} blurhash={media.blurhash} />
       </div>
       <PhotoOverlay active={active}>
-        {videoIcon}
-        <SidebarIcon
-          onClick={e => {
-            e.stopPropagation()
-            selectImage()
-          }}
-        />
         {heartIcon}
       </PhotoOverlay>
     </MediaContainer>

@@ -15,7 +15,7 @@ export type SetOrderingFn = (args: {
 function useOrderingParams({ getParam, setParams }: UrlParams) {
   const orderBy = getParam('orderBy', 'date_shot')
 
-  const orderDirStr = getParam('orderDirection', 'ASC') || 'hello'
+  const orderDirStr = getParam('orderDirection', 'DESC') || 'hello'
   const orderDirection = orderDirStr as OrderDirection
 
   const setOrdering: SetOrderingFn = useCallback(

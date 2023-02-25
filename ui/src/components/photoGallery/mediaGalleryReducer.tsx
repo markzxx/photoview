@@ -63,8 +63,8 @@ export function mediaGalleryReducer(
       return {
         ...state,
         media: action.media,
-        activeIndex: -1,
-        presenting: false,
+        // activeIndex: -1,
+        // presenting: false,
       }
   }
 }
