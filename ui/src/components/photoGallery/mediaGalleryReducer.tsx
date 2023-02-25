@@ -11,6 +11,7 @@ export type GalleryAction =
   | { type: 'nextImage' }
   | { type: 'previousImage' }
   | { type: 'closePresentMode' }
+  | { type: 'deleteMedia' }
 
 export type PhotoGalleryAction =
   | GalleryAction
@@ -66,7 +67,16 @@ export function mediaGalleryReducer(
         // activeIndex: -1,
         // presenting: false,
       }
+    case 'deleteMedia':
+      let newMedia = [...state.media]
+      newMedia.splice(state.activeIndex, 1)
+      return {
+        ...state,
+        media: newMedia,
+        activeIndex: Math.min(newMedia.length - 1, state.activeIndex)
+      }
   }
+  return state
 }
 
 export interface MediaGalleryPopStateEvent extends PopStateEvent {

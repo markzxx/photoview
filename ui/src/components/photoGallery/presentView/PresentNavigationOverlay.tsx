@@ -77,22 +77,22 @@ const PresentNavigationOverlay = ({
   dispatchMedia,
   disableSaveCloseInHistory,
 }: PresentNavigationOverlayProps) => {
-  const [hide, setHide] = useState(true)
-  const onMouseMove = useRef<null | DebouncedFn<() => void>>(null)
+  // const [hide, setHide] = useState(true)
+  // const onMouseMove = useRef<null | DebouncedFn<() => void>>(null)
 
-  useEffect(() => {
-    onMouseMove.current = debounce(
-      () => {
-        setHide(hide => !hide)
-      },
-      2000,
-      true
-    )
-
-    return () => {
-      onMouseMove.current?.cancel()
-    }
-  }, [])
+  // useEffect(() => {
+  //   onMouseMove.current = debounce(
+  //     () => {
+  //       setHide(hide => !hide)
+  //     },
+  //     2000,
+  //     true
+  //   )
+  //
+  //   return () => {
+  //     onMouseMove.current?.cancel()
+  //   }
+  // }, [])
 
   const handlers = useSwipeable({
     onSwipedLeft: () => dispatchMedia({ type: 'nextImage' }),
@@ -105,14 +105,14 @@ const PresentNavigationOverlay = ({
     <StyledOverlayContainer
       data-testid="present-overlay"
       onMouseMove={() => {
-        onMouseMove.current && onMouseMove.current()
+        // onMouseMove.current && onMouseMove.current()
       }}
     >
     <div {...handlers}>
       {children}
       <NavigationButton
         aria-label="Previous image"
-        className={hide ? 'hide' : undefined}
+        // className={hide ? 'hide' : undefined}
         align="left"
         onClick={() => dispatchMedia({ type: 'previousImage' })}
       >
@@ -120,7 +120,7 @@ const PresentNavigationOverlay = ({
       </NavigationButton>
       <NavigationButton
         aria-label="Next image"
-        className={hide ? 'hide' : undefined}
+        // className={hide ? 'hide' : undefined}
         align="right"
         onClick={() => dispatchMedia({ type: 'nextImage' })}
       >
@@ -128,7 +128,7 @@ const PresentNavigationOverlay = ({
       </NavigationButton>
       <ExitButton
         aria-label="Exit presentation mode"
-        className={hide ? 'hide' : undefined}
+        // className={hide ? 'hide' : undefined}
         onClick={() => {
           if (disableSaveCloseInHistory === true) {
             dispatchMedia({ type: 'closePresentMode' })

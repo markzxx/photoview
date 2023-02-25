@@ -37,6 +37,7 @@ export const MEDIA_GALLERY_FRAGMENT = gql`
   fragment MediaGalleryFields on Media {
     id
     type
+    title
     blurhash
     thumbnail {
       url

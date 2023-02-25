@@ -150,50 +150,49 @@ export const MediaThumbnail = ({
   clickPresent,
   clickFavorite,
 }: MediaThumbnailProps) => {
-  let heartIcon = null
-  if (media.favorite !== undefined) {
-    heartIcon = (
-      <FavoriteIcon
-        favorite={media.favorite}
-        onClick={e => {
-          e.stopPropagation()
-          clickFavorite()
-        }}
-      />
-    )
-  }
-
   let minWidth = 100
   if (media.thumbnail) {
     minWidth = Math.floor(
       (media.thumbnail.width / media.thumbnail.height) * 200
     )
   }
-
+  
   return (
-    <MediaContainer
-      key={media.id}
-      style={{
-        cursor: 'pointer',
-        minWidth: `clamp(124px, ${minWidth}px, 100% - 8px)`,
-      }}
-      onClick={() => {
-        clickPresent()
-      }}
-    >
-      <div
+    <div>
+      <MediaContainer
+        key={media.id}
         style={{
-          // minWidth: `min(${minWidth}px, 100%)`,
-          minWidth: `${minWidth}px`,
-          height: `200px`,
+          cursor: 'pointer',
+          minWidth: `clamp(124px, ${minWidth}px, 100% - 8px)`,
+        }}
+        onClick={() => {
+          clickPresent()
         }}
       >
-        <LazyPhoto src={media.thumbnail?.url} blurhash={media.blurhash} />
+        <div
+          style={{
+            // minWidth: `min(${minWidth}px, 100%)`,
+            minWidth: `${minWidth}px`,
+            height: `200px`,
+          }}
+        >
+          <LazyPhoto src={media.thumbnail?.url} blurhash={media.blurhash} />
+        </div>
+        <PhotoOverlay active={active}>
+          <FavoriteIcon
+            favorite={media.favorite}
+            onClick={e => {
+              e.stopPropagation()
+              clickFavorite()
+            }}
+          />
+        </PhotoOverlay>
+      </MediaContainer>
+      <div className="whitespace-nowrap overflow-hidden overflow-ellipsis text-center">
+        {media.title.substring(0, 6)}
       </div>
-      <PhotoOverlay active={active}>
-        {heartIcon}
-      </PhotoOverlay>
-    </MediaContainer>
+    </div>
+
   )
 }
 

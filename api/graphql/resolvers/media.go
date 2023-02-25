@@ -2,6 +2,10 @@ package resolvers
 
 import (
 	"context"
+	"github.com/photoview/photoview/api/utils"
+	"os"
+	"path"
+	"strconv"
 	"strings"
 
 	"github.com/photoview/photoview/api/dataloader"
@@ -200,6 +204,35 @@ func (r *mutationResolver) FavoriteMedia(ctx context.Context, mediaID int, favor
 	}
 
 	return user.FavoriteMedia(r.DB(ctx), mediaID, favorite)
+}
+
+func (r *mutationResolver) DeleteMedia(ctx context.Context, mediaID int) (*models.Album, error) {
+
+	var media models.Media
+	var album models.Album
+	if err := r.DB(ctx).First(&media, mediaID).Error; err != nil {
+		return nil, errors.Wrap(err, "get media from database")
+	}
+
+	reyclePath := path.Join(utils.EnvRecyclePath.GetValue(), media.Title)
+	err := os.Rename(media.Path, reyclePath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "remove file to recycle folder (%s)", reyclePath)
+	}
+
+	cachePath := path.Join(utils.MediaCachePath(), strconv.Itoa(int(media.AlbumID)), strconv.Itoa(int(media.ID)))
+	err = os.RemoveAll(cachePath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "delete unused cache folder (%s)", cachePath)
+	}
+
+	if err := r.DB(ctx).Delete(media).Error; err != nil {
+		return nil, errors.Wrap(err, "delete media from database")
+	}
+
+	r.DB(ctx).First(&album, media.AlbumID)
+
+	return &album, nil
 }
 
 func (r *mediaResolver) Faces(ctx context.Context, media *models.Media) ([]*models.ImageFace, error) {

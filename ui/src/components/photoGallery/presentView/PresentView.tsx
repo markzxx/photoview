@@ -4,7 +4,12 @@ import PresentNavigationOverlay from './PresentNavigationOverlay'
 import PresentMedia from './PresentMedia'
 import { closePresentModeAction, GalleryAction } from '../mediaGalleryReducer'
 import { MediaGalleryFields } from '../__generated__/MediaGalleryFields'
-import {toggleFavoriteAction, useMarkFavoriteMutation} from "../photoGalleryMutations";
+import {
+  toggleDeleteAction,
+  toggleFavoriteAction,
+  useDeleteMediaMutation,
+  useMarkFavoriteMutation
+} from "../photoGalleryMutations";
 
 const StyledContainer = styled.div`
   position: fixed;
@@ -30,6 +35,16 @@ const PresentFavoriteButton = styled.button`
   cursor: pointer;
   position: absolute;
   left: 10%;
+  top: 80%;
+`
+
+const PresentDeleteButton = styled.button`
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  position: absolute;
+  left: 85%;
   top: 80%;
 `
 
@@ -62,6 +77,32 @@ const PresentFavoriteIcon = ({ favorite, onClick }: FavoriteIconProps) => {
           ></path>
         </svg>
       </PresentFavoriteButton>
+  )
+}
+
+type DeleteIconProps = {
+  onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void
+}
+
+const PresentDeleteIcon = ({ onClick }: DeleteIconProps) => {
+  return (
+    <PresentDeleteButton
+      onClick={onClick}
+    >
+      <svg
+        className="text-white m-auto mt-1"
+        width="100px"
+        height="100px"
+        viewBox="0 0 19 17"
+        version="1.1"
+      >
+        <path
+          d="m0,7.99248l0,0c0,-4.6944 3.80559,-8.49998 8.5,-8.49998l0,0c2.25437,0 4.4164,0.89553 6.01041,2.4896c1.59407,1.59406 2.4896,3.75608 2.4896,6.01039l0,0c0,4.69446 -3.80556,8.50002 -8.50001,8.50002l0,0c-4.69441,0 -8.5,-3.80556 -8.5,-8.50002l0,0zm13.72557,3.80247l0,0c1.87142,-2.5719 1.59324,-6.1231 -0.65585,-8.37216c-2.24909,-2.24908 -5.80029,-2.52726 -8.37213,-0.65582l9.02798,9.02798zm-10.4511,-7.60486c-1.87143,2.57189 -1.59326,6.12309 0.65582,8.37212c2.24907,2.24909 5.80028,2.52727 8.37211,0.65585l-9.02793,-9.02797l0,0z"          fill='currentColor'
+          strokeWidth="2"
+          color="gray"
+        ></path>
+      </svg>
+    </PresentDeleteButton>
   )
 }
 
@@ -110,7 +151,7 @@ const PresentView = ({
     }
   })
     const [markFavorite] = useMarkFavoriteMutation()
-
+    const [deleteMutation] = useDeleteMediaMutation()
 
     return (
     <StyledContainer className={className}>
@@ -130,6 +171,16 @@ const PresentView = ({
             })
             e.stopPropagation()
           }}
+      />
+      <PresentDeleteIcon
+        onClick={e => {
+          toggleDeleteAction({
+            media: activeMedia,
+            deleteMutation
+          })
+          dispatchMedia({ type: 'deleteMedia' })
+          e.stopPropagation()
+        }}
       />
     </StyledContainer>
   )

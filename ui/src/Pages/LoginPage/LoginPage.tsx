@@ -81,7 +81,7 @@ const LoginPage = () => {
   return (
     <>
       <Helmet>
-        <title>{t('title.login', 'Login')} - Photoview</title>
+        <title>{t('title.login', 'Login')} - Cyplog</title>
       </Helmet>
       <div>
         <LogoHeader />
