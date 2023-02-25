@@ -8,7 +8,6 @@ import { useSwipeable } from 'react-swipeable'
 import ExitIcon from './icons/Exit'
 import NextIcon from './icons/Next'
 import PrevIcon from './icons/Previous'
-
 const StyledOverlayContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -53,9 +52,9 @@ const ExitButton = styled(OverlayButton)`
 `
 
 const NavigationButton = styled(OverlayButton)<{ align: 'left' | 'right' }>`
-  height: 80%;
+  height: 20%;
   width: 20%;
-  top: 10%;
+  top: 40%;
 
   ${({ align: float }) => (float == 'left' ? 'left: 0;' : null)}
   ${({ align: float }) => (float == 'right' ? 'right: 0;' : null)}

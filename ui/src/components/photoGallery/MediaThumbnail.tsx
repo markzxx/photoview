@@ -81,12 +81,12 @@ const FavoriteIcon = ({ favorite, onClick }: FavoriteIconProps) => {
   return (
     <HoverIcon
       onClick={onClick}
-      style={{ opacity: favorite ? '0.75' : undefined }}
+      style={{ opacity: favorite ? '0.75' : '0.5' }}
     >
       <svg
         className="text-white m-auto mt-1"
-        width="19px"
-        height="17px"
+        width="38px"
+        height="34px"
         viewBox="0 0 19 17"
         version="1.1"
       >
@@ -95,6 +95,7 @@ const FavoriteIcon = ({ favorite, onClick }: FavoriteIconProps) => {
           fill={favorite ? 'currentColor' : 'none'}
           stroke="currentColor"
           strokeWidth={favorite ? '0' : '2'}
+          color="red"
         ></path>
       </svg>
     </HoverIcon>
