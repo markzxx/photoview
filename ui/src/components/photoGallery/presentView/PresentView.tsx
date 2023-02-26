@@ -35,7 +35,7 @@ const PresentFavoriteButton = styled.button`
   cursor: pointer;
   position: absolute;
   left: 10%;
-  top: 80%;
+  bottom: 5%;
 `
 
 const PresentDeleteButton = styled.button`
@@ -44,8 +44,18 @@ const PresentDeleteButton = styled.button`
   outline: none;
   cursor: pointer;
   position: absolute;
-  left: 85%;
-  top: 80%;
+  right: 10%;
+  bottom: 5%;
+`
+
+const PresentTitle = styled.div`
+  width: 100%;
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  top: 0;
+  font-size: 30px;
 `
 
 type FavoriteIconProps = {
@@ -165,23 +175,30 @@ const PresentView = ({
       <PresentFavoriteIcon
           favorite={activeMedia.favorite}
           onClick={e => {
+            e.stopPropagation()
             toggleFavoriteAction({
                 media: activeMedia,
                 markFavorite
             })
-            e.stopPropagation()
           }}
       />
       <PresentDeleteIcon
         onClick={e => {
-          toggleDeleteAction({
-            media: activeMedia,
-            deleteMutation
-          })
-          dispatchMedia({ type: 'deleteMedia' })
           e.stopPropagation()
+          var r = confirm("确认删除")
+          if (r)
+          {
+            toggleDeleteAction({
+              media: activeMedia,
+              deleteMutation
+            })
+            dispatchMedia({ type: 'deleteMedia' })
+          }
         }}
       />
+      <PresentTitle>
+          {activeMedia.title.substring(0, 6)}
+      </PresentTitle>
     </StyledContainer>
   )
 }

@@ -64,6 +64,7 @@ const LoginPage = () => {
       AuthorizeVariables
   >(authorizeMutation)
 
+  console.log(loading)
   if (!loading) {
     authorize({
         variables: {

@@ -214,9 +214,10 @@ func (r *mutationResolver) DeleteMedia(ctx context.Context, mediaID int) (*model
 		return nil, errors.Wrap(err, "get media from database")
 	}
 
-	reyclePath := path.Join(utils.EnvRecyclePath.GetValue(), media.Title)
+	reyclePath := path.Join(utils.RecyclePath(), media.Path)
+	err1 := os.MkdirAll(path.Dir(reyclePath), os.ModePerm)
 	err := os.Rename(media.Path, reyclePath)
-	if err != nil {
+	if err1 != nil || err != nil {
 		return nil, errors.Wrapf(err, "remove file to recycle folder (%s)", reyclePath)
 	}
 

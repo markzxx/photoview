@@ -84,3 +84,12 @@ func UIPath() string {
 
 	return "./ui"
 }
+
+// UIPath returns the value from where the static UI files are located if SERVE_UI=1
+func RecyclePath() string {
+	if path := EnvRecyclePath.GetValue(); path != "" {
+		return path
+	}
+
+	return "./recycle"
+}

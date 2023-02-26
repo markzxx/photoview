@@ -31,7 +31,7 @@ const Layout = ({ children, title, ...otherProps }: LayoutProps) => {
         <Header />
         <div className="">
           <Authorized>
-            <MainMenu />
+            {/*<MainMenu />*/}
           </Authorized>
           <div
             className={`mx-3 my-3 lg:mt-5 lg:mr-8 lg:ml-[292px] ${

@@ -91,6 +91,7 @@ const SubscriptionsHook = ({
         percent: msg.progress || undefined,
       },
     }
+    console.log(newNotification)
 
     if (msg.timeout) {
       // Clear old timeout, to replace it with the new one

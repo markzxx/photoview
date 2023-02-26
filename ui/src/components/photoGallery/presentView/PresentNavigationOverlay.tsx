@@ -30,9 +30,8 @@ const OverlayButton = styled.button`
   }
 
   & svg path {
-    stroke: rgba(255, 255, 255, 0.5);
-    transition-property: stroke, filter;
-    transition-duration: 140ms;
+    stroke: rgba(255, 255, 255, 1);
+    filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.6));
   }
 
   &:hover svg path {
@@ -95,10 +94,10 @@ const PresentNavigationOverlay = ({
   // }, [])
 
   const handlers = useSwipeable({
-    onSwipedLeft: () => dispatchMedia({ type: 'nextImage' }),
-    onSwipedRight: () => dispatchMedia({ type: 'previousImage' }),
-    preventScrollOnSwipe: false,
-    trackMouse: false,
+    // onSwipedLeft: () => dispatchMedia({ type: 'nextImage' }),
+    // onSwipedRight: () => dispatchMedia({ type: 'previousImage' }),
+    // preventScrollOnSwipe: true,
+    // trackTouch: false,
   })
 
   return (

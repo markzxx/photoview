@@ -105,7 +105,7 @@ const Messages = () => {
 
   return (
     <Container>
-      {messageElems}
+      {/*{messageElems}*/}
       {authToken() && (
         <SubscriptionsHook messages={messages} setMessages={setMessages} />
       )}
