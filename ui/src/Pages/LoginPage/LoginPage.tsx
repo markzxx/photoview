@@ -59,24 +59,28 @@ const LoginPage = () => {
   if (authToken() || initialSetupData?.siteInfo?.initialSetup) {
     return null
   }
-  const [authorize, { loading, data }] = useMutation<
+  const [authorize, {loading}] = useMutation<
       Authorize,
       AuthorizeVariables
-  >(authorizeMutation, {
-    onCompleted: data => {
-      const { success, token } = data.authorizeUser
+  >(authorizeMutation)
 
-      if (success && token) {
-        login(token)
+  if (!loading) {
+    authorize({
+        variables: {
+          username: "admin",
+          password: "admin",
+        },
+        onCompleted: data => {
+          const {success, token} = data.authorizeUser
+
+          if (success && token) {
+            login(token)
+          }
+        }
       }
-    },
-  })
-  authorize({
-    variables: {
-      username: "admin",
-      password: "admin",
-    },
-  })
+    )
+  }
+
 
   return (
     <>

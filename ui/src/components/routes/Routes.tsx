@@ -87,7 +87,6 @@ const IndexPage = () => {
   const token = authToken()
 
   const dest = token ? '/albums' : '/login'
-
   return <Navigate to={dest} />
 }
 
