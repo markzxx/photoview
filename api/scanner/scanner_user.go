@@ -3,12 +3,6 @@ package scanner
 import (
 	"bufio"
 	"container/list"
-	"io/ioutil"
-	"log"
-	"os"
-	"path"
-	"sort"
-
 	"github.com/photoview/photoview/api/graphql/models"
 	"github.com/photoview/photoview/api/scanner/scanner_cache"
 	"github.com/photoview/photoview/api/scanner/scanner_tasks/cleanup_tasks"
@@ -17,6 +11,11 @@ import (
 	"github.com/pkg/errors"
 	ignore "github.com/sabhiram/go-gitignore"
 	"gorm.io/gorm"
+	"io/ioutil"
+	"log"
+	"os"
+	"path"
+	"sort"
 )
 
 func getPhotoviewIgnore(ignorePath string) ([]string, error) {
@@ -171,6 +170,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 				}
 			} else {
 				album = &albumResult[0]
+				album.LastModifyTime = &albumInfo.modifyTime
 
 				// Add user as an owner of the album if not already
 				var userAlbumOwner []models.User
