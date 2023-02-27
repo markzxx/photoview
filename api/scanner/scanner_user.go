@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 
 	"github.com/photoview/photoview/api/graphql/models"
 	"github.com/photoview/photoview/api/scanner/scanner_cache"
@@ -102,6 +103,10 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 			scanErrors = append(scanErrors, errors.Wrapf(err, "read directory (%s)", albumPath))
 			continue
 		}
+
+		sort.SliceStable(dirContent, func(i, j int) bool {
+			return dirContent[i].ModTime().Unix() > dirContent[j].ModTime().Unix()
+		})
 
 		// Skip this dir if in ignore list
 		ignorePaths := ignore.CompileIgnoreLines(albumIgnore...)
@@ -254,6 +259,10 @@ func directoryContainsPhotos(rootPath string, cache *scanner_cache.AlbumScannerC
 			scanner_utils.ScannerError("Could not read directory (%s): %s\n", dirPath, err.Error())
 			return false
 		}
+
+		sort.SliceStable(dirContent, func(i, j int) bool {
+			return dirContent[i].ModTime().Unix() > dirContent[j].ModTime().Unix()
+		})
 
 		for _, fileInfo := range dirContent {
 			filePath := path.Join(dirPath, fileInfo.Name())

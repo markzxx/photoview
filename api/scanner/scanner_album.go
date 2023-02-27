@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 
 	"github.com/photoview/photoview/api/graphql/models"
 	"github.com/photoview/photoview/api/scanner/media_encoding"
@@ -122,6 +123,10 @@ func findMediaForAlbum(ctx scanner_task.TaskContext) ([]*models.Media, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	sort.SliceStable(dirContent, func(i, j int) bool {
+		return dirContent[i].ModTime().Unix() > dirContent[j].ModTime().Unix()
+	})
 
 	for _, item := range dirContent {
 		mediaPath := path.Join(ctx.GetAlbum().Path, item.Name())
