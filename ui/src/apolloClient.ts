@@ -84,7 +84,7 @@ const linkError = onError(({ graphQLErrors, networkError }) => {
 
     if (graphQLErrors.find(x => x.message == 'unauthorized')) {
       console.log('Unauthorized, clearing token cookie')
-      // clearTokenCookie()
+      clearTokenCookie()
       // location.reload()
     }
   }
