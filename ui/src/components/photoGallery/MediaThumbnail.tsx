@@ -157,43 +157,40 @@ export const MediaThumbnail = ({
     )
   }
   
-  return (
-    <div>
-      <MediaContainer
-        key={media.id}
+  return <div>
+    <MediaContainer
+      key={media.id}
+      style={{
+        cursor: 'pointer',
+        minWidth: `clamp(124px, ${minWidth}px, 100% - 8px)`,
+      }}
+      onClick={() => {
+        clickPresent()
+      }}
+    >
+      <div
         style={{
-          cursor: 'pointer',
-          minWidth: `clamp(124px, ${minWidth}px, 100% - 8px)`,
-        }}
-        onClick={() => {
-          clickPresent()
+          // minWidth: `min(${minWidth}px, 100%)`,
+          minWidth: `${minWidth}px`,
+          height: `200px`,
         }}
       >
-        <div
-          style={{
-            // minWidth: `min(${minWidth}px, 100%)`,
-            minWidth: `${minWidth}px`,
-            height: `200px`,
-          }}
-        >
-          <LazyPhoto src={media.thumbnail?.url} blurhash={media.blurhash} />
-        </div>
-        <PhotoOverlay active={active}>
-          <FavoriteIcon
-            favorite={media.favorite}
-            onClick={e => {
-              e.stopPropagation()
-              clickFavorite()
-            }}
-          />
-        </PhotoOverlay>
-      </MediaContainer>
-      <div className="whitespace-nowrap overflow-hidden overflow-ellipsis text-center">
-        {media.title.substring(0, 6)}
+        <LazyPhoto src={media.thumbnail?.url} blurhash={media.blurhash} />
       </div>
+      <PhotoOverlay active={active}>
+        <FavoriteIcon
+          favorite={media.favorite}
+          onClick={e => {
+            e.stopPropagation()
+            clickFavorite()
+          }}
+        />
+      </PhotoOverlay>
+    </MediaContainer>
+    <div className="whitespace-nowrap overflow-hidden overflow-ellipsis text-center">
+      {media.title.match(/[0-9]+/i) ? media.title.match(/[0-9]+/i)[0] : media.title}
     </div>
-
-  )
+  </div>
 }
 
 export const MediaPlaceholder = styled.div`

@@ -197,7 +197,7 @@ const PresentView = ({
         }}
       />
       <PresentTitle>
-          {activeMedia.title.substring(0, 6)}
+        {activeMedia.title.match(/[0-9]+/i) ? activeMedia.title.match(/[0-9]+/i)[0] : activeMedia.title}
       </PresentTitle>
     </StyledContainer>
   )
