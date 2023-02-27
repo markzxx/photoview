@@ -58,16 +58,17 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Album struct {
-		FilePath    func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Media       func(childComplexity int, order *models.Ordering, paginate *models.Pagination, onlyFavorites *bool) int
-		Owner       func(childComplexity int) int
-		ParentAlbum func(childComplexity int) int
-		Path        func(childComplexity int) int
-		Shares      func(childComplexity int) int
-		SubAlbums   func(childComplexity int, order *models.Ordering, paginate *models.Pagination) int
-		Thumbnail   func(childComplexity int) int
-		Title       func(childComplexity int) int
+		FilePath       func(childComplexity int) int
+		ID             func(childComplexity int) int
+		LastModifyTime func(childComplexity int) int
+		Media          func(childComplexity int, order *models.Ordering, paginate *models.Pagination, onlyFavorites *bool) int
+		Owner          func(childComplexity int) int
+		ParentAlbum    func(childComplexity int) int
+		Path           func(childComplexity int) int
+		Shares         func(childComplexity int) int
+		SubAlbums      func(childComplexity int, order *models.Ordering, paginate *models.Pagination) int
+		Thumbnail      func(childComplexity int) int
+		Title          func(childComplexity int) int
 	}
 
 	AuthorizeResult struct {
@@ -288,6 +289,7 @@ type AlbumResolver interface {
 	Thumbnail(ctx context.Context, obj *models.Album) (*models.Media, error)
 	Path(ctx context.Context, obj *models.Album) ([]*models.Album, error)
 	Shares(ctx context.Context, obj *models.Album) ([]*models.ShareToken, error)
+	LastModifyTime(ctx context.Context, obj *models.Album) (*int, error)
 }
 type FaceGroupResolver interface {
 	ImageFaces(ctx context.Context, obj *models.FaceGroup, paginate *models.Pagination) ([]*models.ImageFace, error)
@@ -401,6 +403,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Album.ID(childComplexity), true
+
+	case "Album.lastModifyTime":
+		if e.complexity.Album.LastModifyTime == nil {
+			break
+		}
+
+		return e.complexity.Album.LastModifyTime(childComplexity), true
 
 	case "Album.media":
 		if e.complexity.Album.Media == nil {
@@ -2955,6 +2964,8 @@ func (ec *executionContext) fieldContext_Album_subAlbums(ctx context.Context, fi
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -3029,6 +3040,8 @@ func (ec *executionContext) fieldContext_Album_parentAlbum(ctx context.Context, 
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -3270,6 +3283,8 @@ func (ec *executionContext) fieldContext_Album_path(ctx context.Context, field g
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -3332,6 +3347,47 @@ func (ec *executionContext) fieldContext_Album_shares(ctx context.Context, field
 				return ec.fieldContext_ShareToken_media(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ShareToken", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Album_lastModifyTime(ctx context.Context, field graphql.CollectedField, obj *models.Album) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Album_lastModifyTime(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Album().LastModifyTime(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Album_lastModifyTime(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Album",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4498,6 +4554,8 @@ func (ec *executionContext) fieldContext_Media_album(ctx context.Context, field 
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -6694,6 +6752,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteMedia(ctx context.Contex
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -7045,6 +7105,8 @@ func (ec *executionContext) fieldContext_Mutation_userAddRootPath(ctx context.Co
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -7138,6 +7200,8 @@ func (ec *executionContext) fieldContext_Mutation_userRemoveRootAlbum(ctx contex
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -7536,6 +7600,8 @@ func (ec *executionContext) fieldContext_Mutation_resetAlbumCover(ctx context.Co
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -7632,6 +7698,8 @@ func (ec *executionContext) fieldContext_Mutation_setAlbumCover(ctx context.Cont
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -8768,6 +8836,8 @@ func (ec *executionContext) fieldContext_Query_myAlbums(ctx context.Context, fie
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -8844,6 +8914,8 @@ func (ec *executionContext) fieldContext_Query_album(ctx context.Context, field 
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -10111,6 +10183,8 @@ func (ec *executionContext) fieldContext_SearchResult_albums(ctx context.Context
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -10481,6 +10555,8 @@ func (ec *executionContext) fieldContext_ShareToken_album(ctx context.Context, f
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -10977,6 +11053,8 @@ func (ec *executionContext) fieldContext_TimelineGroup_album(ctx context.Context
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -11317,6 +11395,8 @@ func (ec *executionContext) fieldContext_User_albums(ctx context.Context, field 
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -11403,6 +11483,8 @@ func (ec *executionContext) fieldContext_User_rootAlbums(ctx context.Context, fi
 				return ec.fieldContext_Album_path(ctx, field)
 			case "shares":
 				return ec.fieldContext_Album_shares(ctx, field)
+			case "lastModifyTime":
+				return ec.fieldContext_Album_lastModifyTime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
 		},
@@ -14032,6 +14114,23 @@ func (ec *executionContext) _Album(ctx context.Context, sel ast.SelectionSet, ob
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "lastModifyTime":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Album_lastModifyTime(ctx, field, obj)
 				return res
 			}
 

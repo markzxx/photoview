@@ -343,6 +343,8 @@ type Album {
 
   "A list of share tokens pointing to this album, owned by the logged in user"
   shares: [ShareToken!]!
+  "Last modify time"
+  lastModifyTime: Int
 }
 
 type MediaURL {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sort"
 	"sync"
 	"time"
 
@@ -252,6 +253,9 @@ func (queue *ScannerQueue) addJob(job *ScannerJob) error {
 		return err
 	}
 	queue.up_next = append(queue.up_next, *job)
+	sort.Slice(queue.up_next, func(i, j int) bool {
+		return *queue.up_next[i].ctx.GetAlbum().LastModifyTime > *queue.up_next[j].ctx.GetAlbum().LastModifyTime
+	})
 	queue.notify()
 
 	return nil

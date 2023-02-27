@@ -93,6 +93,10 @@ func (r *albumResolver) Thumbnail(ctx context.Context, album *models.Album) (*mo
 	return album.Thumbnail(r.DB(ctx))
 }
 
+func (r *albumResolver) LastModifyTime(ctx context.Context, album *models.Album) (*int, error) {
+	return album.LastModifyTime, nil
+}
+
 func (r *albumResolver) SubAlbums(ctx context.Context, parent *models.Album, order *models.Ordering, paginate *models.Pagination) ([]*models.Album, error) {
 
 	var albums []*models.Album

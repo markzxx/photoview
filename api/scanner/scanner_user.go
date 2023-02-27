@@ -63,16 +63,17 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 	scanErrors := make([]error, 0)
 
 	type scanInfo struct {
-		path   string
-		parent *models.Album
-		ignore []string
+		path       string
+		parent     *models.Album
+		ignore     []string
+		modifyTime int
 	}
 
 	scanQueue := list.New()
 
 	for _, album := range userRootAlbums {
 		// Check if user album directory exists on the file system
-		if _, err := os.Stat(album.Path); err != nil {
+		if file, err := os.Stat(album.Path); err != nil {
 			if os.IsNotExist(err) {
 				scanErrors = append(scanErrors, errors.Errorf("Album directory for user '%s' does not exist '%s'\n", user.Username, album.Path))
 			} else {
@@ -80,9 +81,10 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 			}
 		} else {
 			scanQueue.PushBack(scanInfo{
-				path:   album.Path,
-				parent: nil,
-				ignore: nil,
+				path:       album.Path,
+				parent:     nil,
+				ignore:     nil,
+				modifyTime: int(file.ModTime().UTC().Unix()),
 			})
 		}
 	}
@@ -151,9 +153,10 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 				}
 
 				album = &models.Album{
-					Title:         albumTitle,
-					ParentAlbumID: albumParentID,
-					Path:          albumPath,
+					Title:          albumTitle,
+					ParentAlbumID:  albumParentID,
+					Path:           albumPath,
+					LastModifyTime: &albumInfo.modifyTime,
 				}
 
 				// Store album ignore
@@ -213,9 +216,10 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 
 			if (item.IsDir() || isDirSymlink) && directoryContainsPhotos(subalbumPath, album_cache, albumIgnore) {
 				scanQueue.PushBack(scanInfo{
-					path:   subalbumPath,
-					parent: album,
-					ignore: albumIgnore,
+					path:       subalbumPath,
+					parent:     album,
+					ignore:     albumIgnore,
+					modifyTime: int(item.ModTime().UTC().Unix()),
 				})
 			}
 		}
