@@ -90,6 +90,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 	}
 
 	userAlbums := make([]*models.Album, 0)
+	needScanAlbums := make([]*models.Album, 0)
 
 	for scanQueue.Front() != nil {
 		albumInfo := scanQueue.Front().Value.(scanInfo)
@@ -173,6 +174,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 				album = &albumResult[0]
 				if !scan_all && album.LastModifyTime != nil && *album.LastModifyTime == albumInfo.modifyTime {
 					log.Printf("Skip directory: %s", albumPath)
+					userAlbums = append(userAlbums, album)
 					return errors.New("album not modify")
 				}
 
@@ -196,6 +198,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 			}
 
 			userAlbums = append(userAlbums, album)
+			needScanAlbums = append(needScanAlbums, album)
 
 			return nil
 		})
@@ -234,7 +237,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 	deleteErrors := cleanup_tasks.DeleteOldUserAlbums(db, userAlbums, user)
 	scanErrors = append(scanErrors, deleteErrors...)
 
-	return userAlbums, scanErrors
+	return needScanAlbums, scanErrors
 }
 
 func directoryContainsPhotos(rootPath string, cache *scanner_cache.AlbumScannerCache, albumIgnore []string) bool {
