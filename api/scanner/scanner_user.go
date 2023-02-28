@@ -93,6 +93,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 	needScanAlbums := make([]*models.Album, 0)
 
 	for scanQueue.Front() != nil {
+		skip := false
 		albumInfo := scanQueue.Front().Value.(scanInfo)
 		scanQueue.Remove(scanQueue.Front())
 
@@ -172,11 +173,12 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 				}
 			} else {
 				album = &albumResult[0]
-				//if !scan_all && album.LastModifyTime != nil && *album.LastModifyTime == albumInfo.modifyTime {
-				//	log.Printf("Skip directory: %s", albumPath)
-				//	userAlbums = append(userAlbums, album)
-				//	return errors.New("album not modify")
-				//}
+				if !scan_all && album.LastModifyTime != nil && *album.LastModifyTime == albumInfo.modifyTime {
+					log.Printf("Skip directory: %s", albumPath)
+					skip = true
+				} else {
+					tx.Model(&album).Update("last_modify_time", albumInfo.modifyTime)
+				}
 
 				// Add user as an owner of the album if not already
 				var userAlbumOwner []models.User
@@ -191,15 +193,14 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 					}
 				}
 
-				tx.Model(&album).Update("last_modify_time", albumInfo.modifyTime)
-
 				// Update album ignore
 				album_cache.InsertAlbumIgnore(albumPath, albumIgnore)
 			}
 
 			userAlbums = append(userAlbums, album)
-			needScanAlbums = append(needScanAlbums, album)
-
+			if !skip {
+				needScanAlbums = append(needScanAlbums, album)
+			}
 			return nil
 		})
 
@@ -236,7 +237,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 
 	deleteErrors := cleanup_tasks.DeleteOldUserAlbums(db, userAlbums, user)
 	scanErrors = append(scanErrors, deleteErrors...)
-
+	log.Printf("Real scan dir %v", len(needScanAlbums))
 	return needScanAlbums, scanErrors
 }
 
@@ -272,10 +273,6 @@ func directoryContainsPhotos(rootPath string, cache *scanner_cache.AlbumScannerC
 			scanner_utils.ScannerError("Could not read directory (%s): %s\n", dirPath, err.Error())
 			return false
 		}
-
-		sort.SliceStable(dirContent, func(i, j int) bool {
-			return dirContent[i].ModTime().Unix() > dirContent[j].ModTime().Unix()
-		})
 
 		for _, fileInfo := range dirContent {
 			filePath := path.Join(dirPath, fileInfo.Name())
