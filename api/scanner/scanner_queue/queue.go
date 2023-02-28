@@ -210,7 +210,7 @@ func (queue *ScannerQueue) notify() bool {
 	}
 }
 
-func AddAllToQueue() error {
+func AddAllToQueue(scan_all bool) error {
 
 	var users []*models.User
 	result := global_scanner_queue.db.Find(&users)
@@ -219,7 +219,7 @@ func AddAllToQueue() error {
 	}
 
 	for _, user := range users {
-		if err := AddUserToQueue(user); err != nil {
+		if err := AddUserToQueue(user, scan_all); err != nil {
 			return errors.Wrapf(err, "failed to add user for scanning (%d)", user.ID)
 		}
 	}
@@ -229,9 +229,9 @@ func AddAllToQueue() error {
 
 // AddUserToQueue finds all root albums owned by the given user and adds them to the scanner queue.
 // Function does not block.
-func AddUserToQueue(user *models.User) error {
+func AddUserToQueue(user *models.User, scan_all bool) error {
 	album_cache := scanner_cache.MakeAlbumCache()
-	albums, album_errors := scanner.FindAlbumsForUser(global_scanner_queue.db, user, album_cache)
+	albums, album_errors := scanner.FindAlbumsForUser(global_scanner_queue.db, user, album_cache, scan_all)
 	for _, err := range album_errors {
 		return errors.Wrapf(err, "find albums for user (user_id: %d)", user.ID)
 	}

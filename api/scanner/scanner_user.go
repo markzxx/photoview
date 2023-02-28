@@ -43,7 +43,7 @@ func getPhotoviewIgnore(ignorePath string) ([]string, error) {
 	return photoviewIgnore, scanner.Err()
 }
 
-func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cache.AlbumScannerCache) ([]*models.Album, []error) {
+func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cache.AlbumScannerCache, scan_all bool) ([]*models.Album, []error) {
 
 	if err := user.FillAlbums(db); err != nil {
 		return nil, []error{err}
@@ -71,6 +71,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 	scanQueue := list.New()
 
 	for _, album := range userRootAlbums {
+		log.Printf("my albums %s", album.Path)
 		// Check if user album directory exists on the file system
 		if file, err := os.Stat(album.Path); err != nil {
 			if os.IsNotExist(err) {
@@ -170,7 +171,10 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 				}
 			} else {
 				album = &albumResult[0]
-				album.LastModifyTime = &albumInfo.modifyTime
+				if !scan_all && album.LastModifyTime != nil && *album.LastModifyTime == albumInfo.modifyTime {
+					log.Printf("Skip directory: %s", albumPath)
+					return errors.New("album not modify")
+				}
 
 				// Add user as an owner of the album if not already
 				var userAlbumOwner []models.User
@@ -184,6 +188,8 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 						return err
 					}
 				}
+
+				tx.Model(&album).Update("last_modify_time", albumInfo.modifyTime)
 
 				// Update album ignore
 				album_cache.InsertAlbumIgnore(albumPath, albumIgnore)

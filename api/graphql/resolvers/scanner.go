@@ -13,7 +13,7 @@ import (
 )
 
 func (r *mutationResolver) ScanAll(ctx context.Context) (*models.ScannerResult, error) {
-	err := scanner_queue.AddAllToQueue()
+	err := scanner_queue.AddAllToQueue(true)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (r *mutationResolver) ScanUser(ctx context.Context, userID int) (*models.Sc
 		return nil, errors.Wrap(err, "get user from database")
 	}
 
-	scanner_queue.AddUserToQueue(&user)
+	scanner_queue.AddUserToQueue(&user, true)
 
 	startMessage := "Scanner started"
 	return &models.ScannerResult{

@@ -82,7 +82,7 @@ func scanIntervalRunner() {
 				log.Print("Scan interval runner: New ticker detected")
 			case <-mainPeriodicScanner.ticker.C:
 				log.Print("Scan interval runner: Starting periodic scan")
-				scanner_queue.AddAllToQueue()
+				scanner_queue.AddAllToQueue(false)
 			}
 		} else {
 			<-mainPeriodicScanner.ticker_changed
