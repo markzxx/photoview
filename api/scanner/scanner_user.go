@@ -5,7 +5,6 @@ import (
 	"container/list"
 	"github.com/photoview/photoview/api/graphql/models"
 	"github.com/photoview/photoview/api/scanner/scanner_cache"
-	"github.com/photoview/photoview/api/scanner/scanner_tasks/cleanup_tasks"
 	"github.com/photoview/photoview/api/scanner/scanner_utils"
 	"github.com/photoview/photoview/api/utils"
 	"github.com/pkg/errors"
@@ -174,7 +173,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 			} else {
 				album = &albumResult[0]
 				if !scan_all && album.LastModifyTime != nil && *album.LastModifyTime == albumInfo.modifyTime {
-					log.Printf("Skip directory: %s", albumPath)
+					//log.Printf("Skip directory: %s", albumPath)
 					skip = true
 				} else {
 					tx.Model(&album).Update("last_modify_time", albumInfo.modifyTime)
@@ -204,7 +203,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 			return nil
 		})
 
-		if transErr != nil {
+		if skip || transErr != nil {
 			scanErrors = append(scanErrors, errors.Wrap(transErr, "begin database transaction"))
 			continue
 		}
@@ -235,8 +234,8 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 		}
 	}
 
-	deleteErrors := cleanup_tasks.DeleteOldUserAlbums(db, userAlbums, user)
-	scanErrors = append(scanErrors, deleteErrors...)
+	//deleteErrors := cleanup_tasks.DeleteOldUserAlbums(db, userAlbums, user)
+	//scanErrors = append(scanErrors, deleteErrors...)
 	log.Printf("Real scan dir %v", len(needScanAlbums))
 	return needScanAlbums, scanErrors
 }
