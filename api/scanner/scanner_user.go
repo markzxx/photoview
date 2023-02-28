@@ -172,11 +172,11 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 				}
 			} else {
 				album = &albumResult[0]
-				if !scan_all && album.LastModifyTime != nil && *album.LastModifyTime == albumInfo.modifyTime {
-					log.Printf("Skip directory: %s", albumPath)
-					userAlbums = append(userAlbums, album)
-					return errors.New("album not modify")
-				}
+				//if !scan_all && album.LastModifyTime != nil && *album.LastModifyTime == albumInfo.modifyTime {
+				//	log.Printf("Skip directory: %s", albumPath)
+				//	userAlbums = append(userAlbums, album)
+				//	return errors.New("album not modify")
+				//}
 
 				// Add user as an owner of the album if not already
 				var userAlbumOwner []models.User
