@@ -65,29 +65,28 @@ func CleanupMedia(db *gorm.DB, albumId int, albumMedia []*models.Media) []error 
 }
 
 // DeleteOldUserAlbums finds and deletes old albums in the database and cache that does not exist on the filesystem anymore.
-func DeleteOldUserAlbums(db *gorm.DB, scannedAlbums []*models.Album, user *models.User) []error {
-	if len(scannedAlbums) == 0 {
-		return nil
-	}
-
-	scannedAlbumIDs := make([]interface{}, len(scannedAlbums))
-	for i, album := range scannedAlbums {
-		scannedAlbumIDs[i] = album.ID
-	}
-
-	// Old albums to be deleted
-	var deleteAlbums []models.Album
+func DeleteOldUserAlbums(db *gorm.DB, user *models.User) []error {
+	var allUserAlbums []models.Album
 
 	// Find old albums in database
 	query := db.
 		Select("albums.*").
 		Table("user_albums").
 		Joins("JOIN albums ON user_albums.album_id = albums.id").
-		Where("user_id = ?", user.ID).
-		Where("album_id NOT IN (?)", scannedAlbumIDs)
+		Where("user_id = ?", user.ID)
 
-	if err := query.Find(&deleteAlbums).Error; err != nil {
+	if err := query.Find(&allUserAlbums).Error; err != nil {
 		return []error{errors.Wrap(err, "get albums to be deleted from database")}
+	}
+
+	// Old albums to be deleted
+	var deleteAlbums []models.Album
+
+	for _, album := range allUserAlbums {
+		_, err := os.Stat(album.Path)
+		if err != nil {
+			deleteAlbums = append(deleteAlbums, album)
+		}
 	}
 
 	if len(deleteAlbums) == 0 {

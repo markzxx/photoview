@@ -5,6 +5,7 @@ import (
 	"container/list"
 	"github.com/photoview/photoview/api/graphql/models"
 	"github.com/photoview/photoview/api/scanner/scanner_cache"
+	"github.com/photoview/photoview/api/scanner/scanner_tasks/cleanup_tasks"
 	"github.com/photoview/photoview/api/scanner/scanner_utils"
 	"github.com/photoview/photoview/api/utils"
 	"github.com/pkg/errors"
@@ -70,7 +71,6 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 	scanQueue := list.New()
 
 	for _, album := range userRootAlbums {
-		log.Printf("my albums %s", album.Path)
 		// Check if user album directory exists on the file system
 		if file, err := os.Stat(album.Path); err != nil {
 			if os.IsNotExist(err) {
@@ -88,7 +88,6 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 		}
 	}
 
-	userAlbums := make([]*models.Album, 0)
 	needScanAlbums := make([]*models.Album, 0)
 
 	for scanQueue.Front() != nil {
@@ -99,17 +98,6 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 		albumPath := albumInfo.path
 		albumParent := albumInfo.parent
 		albumIgnore := albumInfo.ignore
-
-		// Read path
-		dirContent, err := ioutil.ReadDir(albumPath)
-		if err != nil {
-			scanErrors = append(scanErrors, errors.Wrapf(err, "read directory (%s)", albumPath))
-			continue
-		}
-
-		sort.SliceStable(dirContent, func(i, j int) bool {
-			return dirContent[i].ModTime().Unix() > dirContent[j].ModTime().Unix()
-		})
 
 		// Skip this dir if in ignore list
 		ignorePaths := ignore.CompileIgnoreLines(albumIgnore...)
@@ -130,7 +118,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 		var album *models.Album
 
 		transErr := db.Transaction(func(tx *gorm.DB) error {
-			log.Printf("Scanning directory: %s", albumPath)
+			//log.Printf("Scanning directory: %s", albumPath)
 
 			// check if album already exists
 			var albumResult []models.Album
@@ -196,17 +184,31 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 				album_cache.InsertAlbumIgnore(albumPath, albumIgnore)
 			}
 
-			userAlbums = append(userAlbums, album)
 			if !skip {
 				needScanAlbums = append(needScanAlbums, album)
 			}
 			return nil
 		})
 
-		if skip || transErr != nil {
+		if skip {
+			continue
+		}
+
+		if transErr != nil {
 			scanErrors = append(scanErrors, errors.Wrap(transErr, "begin database transaction"))
 			continue
 		}
+
+		// Read path
+		dirContent, err := ioutil.ReadDir(albumPath)
+		if err != nil {
+			scanErrors = append(scanErrors, errors.Wrapf(err, "read directory (%s)", albumPath))
+			continue
+		}
+
+		sort.SliceStable(dirContent, func(i, j int) bool {
+			return dirContent[i].ModTime().Unix() > dirContent[j].ModTime().Unix()
+		})
 
 		// Scan for sub-albums
 		for _, item := range dirContent {
@@ -234,9 +236,11 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 		}
 	}
 
-	//deleteErrors := cleanup_tasks.DeleteOldUserAlbums(db, userAlbums, user)
-	//scanErrors = append(scanErrors, deleteErrors...)
-	log.Printf("Real scan dir %v", len(needScanAlbums))
+	if len(needScanAlbums) > 0 {
+		deleteErrors := cleanup_tasks.DeleteOldUserAlbums(db, user)
+		scanErrors = append(scanErrors, deleteErrors...)
+	}
+	log.Printf("Real scan albums: %v", len(needScanAlbums))
 	return needScanAlbums, scanErrors
 }
 
