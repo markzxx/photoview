@@ -2,6 +2,7 @@ package resolvers
 
 import (
 	"context"
+	"path"
 	"time"
 
 	"github.com/photoview/photoview/api/database/drivers"
@@ -85,4 +86,19 @@ func (r *mutationResolver) SetScannerConcurrentWorkers(ctx context.Context, work
 	scanner_queue.ChangeScannerConcurrentWorkers(siteInfo.ConcurrentWorkers)
 
 	return siteInfo.ConcurrentWorkers, nil
+}
+
+func (r *mutationResolver) MarkModify(ctx context.Context, modPath string) (int, error) {
+	db := r.DB(ctx)
+
+	for modPath != "/" {
+		var album models.Album
+		err := db.Where("path_hash = ?", models.MD5Hash(modPath)).First(&album).Error
+		if err == nil {
+			db.Model(&album).Update("last_modify_time", 1)
+		}
+		modPath = path.Dir(modPath)
+	}
+
+	return 0, nil
 }

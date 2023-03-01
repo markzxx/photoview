@@ -162,6 +162,7 @@ type ComplexityRoot struct {
 		DetachImageFaces             func(childComplexity int, imageFaceIDs []int) int
 		FavoriteMedia                func(childComplexity int, mediaID int, favorite bool) int
 		InitialSetupWizard           func(childComplexity int, username string, password string, rootPath string) int
+		MarkModify                   func(childComplexity int, path string) int
 		MoveImageFaces               func(childComplexity int, imageFaceIDs []int, destinationFaceGroupID int) int
 		ProtectShareToken            func(childComplexity int, token string, password *string) int
 		RecognizeUnlabeledFaces      func(childComplexity int) int
@@ -289,7 +290,6 @@ type AlbumResolver interface {
 	Thumbnail(ctx context.Context, obj *models.Album) (*models.Media, error)
 	Path(ctx context.Context, obj *models.Album) ([]*models.Album, error)
 	Shares(ctx context.Context, obj *models.Album) ([]*models.ShareToken, error)
-	LastModifyTime(ctx context.Context, obj *models.Album) (*int, error)
 }
 type FaceGroupResolver interface {
 	ImageFaces(ctx context.Context, obj *models.FaceGroup, paginate *models.Pagination) ([]*models.ImageFace, error)
@@ -325,6 +325,7 @@ type MutationResolver interface {
 	ProtectShareToken(ctx context.Context, token string, password *string) (*models.ShareToken, error)
 	FavoriteMedia(ctx context.Context, mediaID int, favorite bool) (*models.Media, error)
 	DeleteMedia(ctx context.Context, mediaID int) (*models.Album, error)
+	MarkModify(ctx context.Context, path string) (int, error)
 	UpdateUser(ctx context.Context, id int, username *string, password *string, admin *bool) (*models.User, error)
 	CreateUser(ctx context.Context, username string, password *string, admin bool) (*models.User, error)
 	DeleteUser(ctx context.Context, id int) (*models.User, error)
@@ -972,6 +973,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.InitialSetupWizard(childComplexity, args["username"].(string), args["password"].(string), args["rootPath"].(string)), true
+
+	case "Mutation.markModify":
+		if e.complexity.Mutation.MarkModify == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_markModify_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MarkModify(childComplexity, args["path"].(string)), true
 
 	case "Mutation.moveImageFaces":
 		if e.complexity.Mutation.MoveImageFaces == nil {
@@ -2066,6 +2079,21 @@ func (ec *executionContext) field_Mutation_initialSetupWizard_args(ctx context.C
 		}
 	}
 	args["rootPath"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_markModify_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
 	return args, nil
 }
 
@@ -3366,7 +3394,7 @@ func (ec *executionContext) _Album_lastModifyTime(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Album().LastModifyTime(rctx, obj)
+		return obj.LastModifyTime, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3384,8 +3412,8 @@ func (ec *executionContext) fieldContext_Album_lastModifyTime(ctx context.Contex
 	fc = &graphql.FieldContext{
 		Object:     "Album",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -6766,6 +6794,60 @@ func (ec *executionContext) fieldContext_Mutation_deleteMedia(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteMedia_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_markModify(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_markModify(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MarkModify(rctx, fc.Args["path"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_markModify(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_markModify_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -14122,22 +14204,9 @@ func (ec *executionContext) _Album(ctx context.Context, sel ast.SelectionSet, ob
 
 			})
 		case "lastModifyTime":
-			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Album_lastModifyTime(ctx, field, obj)
-				return res
-			}
+			out.Values[i] = ec._Album_lastModifyTime(ctx, field, obj)
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -14907,6 +14976,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteMedia(ctx, field)
+			})
+
+		case "markModify":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_markModify(ctx, field)
 			})
 
 		case "updateUser":

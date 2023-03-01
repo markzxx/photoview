@@ -132,6 +132,9 @@ type Mutation {
   "Delete a media from filesystem and database"
   deleteMedia(mediaId: ID!): Album! @isAuthorized
 
+  "Mark a path is modify"
+  markModify(path: String!): Int!
+
   "Update a user, fields left as `null` will not be changed"
   updateUser(
     id: ID!
