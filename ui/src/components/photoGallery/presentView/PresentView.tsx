@@ -56,6 +56,7 @@ const PresentTitle = styled.div`
   text-align: center;
   top: 0;
   font-size: 30px;
+  -webkit-text-stroke: 1px black;
 `
 
 type FavoriteIconProps = {

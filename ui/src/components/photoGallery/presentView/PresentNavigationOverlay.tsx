@@ -30,24 +30,19 @@ const OverlayButton = styled.button`
   }
 
   & svg path {
-    stroke: rgba(255, 255, 255, 1);
-    filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.6));
-  }
-
-  &:hover svg path {
-    stroke: rgba(255, 255, 255, 1);
-    filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.6));
-  }
-
-  &.hide svg path {
-    stroke: rgba(255, 255, 255, 0);
-    transition: stroke 300ms;
+    stroke: pink;
+    stroke-width: 10;
   }
 `
 
 const ExitButton = styled(OverlayButton)`
-  left: 28px;
-  top: 28px;
+  height: 20%;
+  width: 20%;
+    & svg {
+    margin: auto;
+    width: 48px;
+    height: 64px;
+  }
 `
 
 const NavigationButton = styled(OverlayButton)<{ align: 'left' | 'right' }>`
