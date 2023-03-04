@@ -135,6 +135,9 @@ type Mutation {
   "Mark a path is modify"
   markModify(path: String!): Int!
 
+  "Make final dir"
+  makeFinalDir(albumId: ID!): Int!
+
   "Update a user, fields left as `null` will not be changed"
   updateUser(
     id: ID!

@@ -162,6 +162,7 @@ type ComplexityRoot struct {
 		DetachImageFaces             func(childComplexity int, imageFaceIDs []int) int
 		FavoriteMedia                func(childComplexity int, mediaID int, favorite bool) int
 		InitialSetupWizard           func(childComplexity int, username string, password string, rootPath string) int
+		MakeFinalDir                 func(childComplexity int, albumID int) int
 		MarkModify                   func(childComplexity int, path string) int
 		MoveImageFaces               func(childComplexity int, imageFaceIDs []int, destinationFaceGroupID int) int
 		ProtectShareToken            func(childComplexity int, token string, password *string) int
@@ -326,6 +327,7 @@ type MutationResolver interface {
 	FavoriteMedia(ctx context.Context, mediaID int, favorite bool) (*models.Media, error)
 	DeleteMedia(ctx context.Context, mediaID int) (*models.Album, error)
 	MarkModify(ctx context.Context, path string) (int, error)
+	MakeFinalDir(ctx context.Context, albumID int) (int, error)
 	UpdateUser(ctx context.Context, id int, username *string, password *string, admin *bool) (*models.User, error)
 	CreateUser(ctx context.Context, username string, password *string, admin bool) (*models.User, error)
 	DeleteUser(ctx context.Context, id int) (*models.User, error)
@@ -973,6 +975,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.InitialSetupWizard(childComplexity, args["username"].(string), args["password"].(string), args["rootPath"].(string)), true
+
+	case "Mutation.makeFinalDir":
+		if e.complexity.Mutation.MakeFinalDir == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_makeFinalDir_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MakeFinalDir(childComplexity, args["albumId"].(int)), true
 
 	case "Mutation.markModify":
 		if e.complexity.Mutation.MarkModify == nil {
@@ -2079,6 +2093,21 @@ func (ec *executionContext) field_Mutation_initialSetupWizard_args(ctx context.C
 		}
 	}
 	args["rootPath"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_makeFinalDir_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["albumId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["albumId"] = arg0
 	return args, nil
 }
 
@@ -6848,6 +6877,60 @@ func (ec *executionContext) fieldContext_Mutation_markModify(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_markModify_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_makeFinalDir(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_makeFinalDir(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MakeFinalDir(rctx, fc.Args["albumId"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_makeFinalDir(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_makeFinalDir_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -14982,6 +15065,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_markModify(ctx, field)
+			})
+
+		case "makeFinalDir":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_makeFinalDir(ctx, field)
 			})
 
 		case "updateUser":

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { SidebarContext } from '../sidebar/Sidebar'
 import AlbumSidebar from '../sidebar/AlbumSidebar'
-import { useLazyQuery, gql } from '@apollo/client'
+import { useLazyQuery, gql, MutationFunction, useMutation } from '@apollo/client'
 import { authToken } from '../../helpers/authentication'
 import { albumPathQuery } from './__generated__/albumPathQuery'
 import useDelay from '../../hooks/useDelay'
@@ -11,6 +11,7 @@ import useDelay from '../../hooks/useDelay'
 import { ReactComponent as GearIcon } from './icons/gear.svg'
 import { tailwindClassNames } from '../../helpers/utils'
 import { buttonStyles } from '../../primitives/form/Input'
+import {MediaGalleryFields} from "../photoGallery/__generated__/MediaGalleryFields";
 
 export const BreadcrumbList = styled.ol<{ hideLastArrow?: boolean }>`
   &
@@ -24,6 +25,12 @@ export const BreadcrumbList = styled.ol<{ hideLastArrow?: boolean }>`
     margin: 6px;
     vertical-align: middle;
   }
+`
+
+const makeFinalDirMutation = gql`
+    mutation makeFinalDir($albumId: ID!) {
+        makeFinalDir(albumId: $albumId) 
+    }
 `
 
 const ALBUM_PATH_QUERY = gql`
@@ -49,7 +56,8 @@ type AlbumTitleProps = {
 const AlbumTitle = ({ album, disableLink = false }: AlbumTitleProps) => {
   const [fetchPath, { data: pathData }] =
     useLazyQuery<albumPathQuery>(ALBUM_PATH_QUERY)
-  const { updateSidebar } = useContext(SidebarContext)
+
+  const [makeFinalDir] = useMutation(makeFinalDirMutation);
 
   useEffect(() => {
     if (!album) return
@@ -109,7 +117,15 @@ const AlbumTitle = ({ album, disableLink = false }: AlbumTitleProps) => {
           aria-label="Album options"
           className={tailwindClassNames(buttonStyles({}), 'px-2 py-2 ml-2')}
           onClick={() => {
-            updateSidebar(<AlbumSidebar albumId={album.id} />)
+            var r = confirm("确认复制文件夹")
+            if (r) {
+              makeFinalDir({
+                variables: {
+                  albumId: album.id,
+                },
+              })
+              alert("复制中, 请稍后在极空间查看")
+            }
           }}
         >
           <GearIcon />
