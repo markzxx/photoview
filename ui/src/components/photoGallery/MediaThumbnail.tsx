@@ -56,18 +56,11 @@ const HoverIcon = styled.button`
   opacity: 0;
   position: relative;
 
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-
   ${MediaContainer}:hover &, ${MediaContainer}:focus-within & {
     opacity: 1 !important;
   }
 
   &:hover,
-  &:focus {
-    background-color: rgba(0, 0, 0, 0.4);
-  }
 
   transition: opacity 100ms, background-color 100ms;
 `
