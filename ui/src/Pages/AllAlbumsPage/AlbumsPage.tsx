@@ -20,7 +20,8 @@ const getAlbumsQuery = gql`
 `
 
 const AlbumsPage = () => {
-  const { error, data } = useQuery<getMyAlbums>(getAlbumsQuery)
+  const { error, data, refetch } = useQuery<getMyAlbums>(getAlbumsQuery)
+  refetch()
   return (
     <Layout title="Albums">
       <AlbumBoxes error={error} albums={data?.myAlbums} />
