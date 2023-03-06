@@ -30,14 +30,14 @@ const OverlayButton = styled.button`
   }
 
   & svg path {
-    stroke: pink;
+    stroke: Gray;
     stroke-width: 10;
   }
 `
 
 const ExitButton = styled(OverlayButton)`
   height: 20%;
-  width: 20%;
+  width: 25%;
     & svg {
     margin: auto;
     width: 48px;
