@@ -26,7 +26,7 @@ const Header = () => {
             src={import.meta.env.BASE_URL + 'cyplog-logo.png'}
             alt="logo"
           />
-          <span className="hidden lg:block ml-2 text-2xl font-light">
+          <span className="ml-2 text-2xl font-light">
           Cyplog
         </span>
         </h1>
