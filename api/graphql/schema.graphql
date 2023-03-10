@@ -138,6 +138,9 @@ type Mutation {
   "Make final dir"
   makeFinalDir(albumId: ID!): Int!
 
+  "Mark retouch file"
+  markRetouchFile(albumId: ID!): Int!
+
   "Update a user, fields left as `null` will not be changed"
   updateUser(
     id: ID!

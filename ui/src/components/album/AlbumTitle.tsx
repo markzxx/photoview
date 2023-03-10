@@ -33,6 +33,12 @@ const makeFinalDirMutation = gql`
     }
 `
 
+const markRetouchFileMutation = gql`
+    mutation markRetouchFile($albumId: ID!) {
+        markRetouchFile(albumId: $albumId)
+    }
+`
+
 const ALBUM_PATH_QUERY = gql`
   query albumPathQuery($id: ID!) {
     album(id: $id) {
@@ -58,6 +64,7 @@ const AlbumTitle = ({ album, disableLink = false }: AlbumTitleProps) => {
     useLazyQuery<albumPathQuery>(ALBUM_PATH_QUERY)
 
   const [makeFinalDir] = useMutation(makeFinalDirMutation);
+  const [markRetouchFile] = useMutation(markRetouchFileMutation);
 
   useEffect(() => {
     if (!album) return
@@ -112,24 +119,44 @@ const AlbumTitle = ({ album, disableLink = false }: AlbumTitleProps) => {
         <h1 className="text-2xl truncate min-w-0">{title}</h1>
       </div>
       {authToken() && (
-        <button
-          title="Album options"
-          aria-label="Album options"
-          className={tailwindClassNames(buttonStyles({}), 'px-2 py-2 ml-2')}
-          onClick={() => {
-            var r = confirm("确认复制文件夹")
-            if (r) {
-              makeFinalDir({
-                variables: {
-                  albumId: album.id,
-                },
-              })
-              alert("复制中, 请稍后在极空间查看")
-            }
-          }}
-        >
-          <GearIcon />
-        </button>
+        <div>
+          <button
+            title="Album options"
+            aria-label="Album options"
+            className={tailwindClassNames(buttonStyles({}), 'px-2 py-2 ml-2')}
+            onClick={() => {
+              var r = confirm("确认复制文件夹")
+              if (r) {
+                makeFinalDir({
+                  variables: {
+                    albumId: album.id,
+                  },
+                })
+                alert("复制中, 请稍后在极空间查看")
+              }
+            }}
+          >
+            创建
+          </button>
+          <button
+            title="Album options"
+            aria-label="Album options"
+            className={tailwindClassNames(buttonStyles({}), 'px-2 py-2 ml-2')}
+            onClick={() => {
+              var r = confirm("确认选中云修文件")
+              if (r) {
+                markRetouchFile({
+                  variables: {
+                    albumId: album.id,
+                  },
+                })
+                alert("修改中, 稍后在云修中生效")
+              }
+            }}
+          >
+            云修
+          </button>
+        </div>
       )}
     </div>
   )

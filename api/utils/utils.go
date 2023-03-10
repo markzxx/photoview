@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -92,4 +93,28 @@ func IsDirSymlink(path string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func RemoveBolanghao(mediaPath string) string {
+	base := path.Base(mediaPath)
+	dir := path.Dir(mediaPath)
+	return path.Join(dir, strings.TrimPrefix(base, "~"))
+}
+
+func AddBolanghao(mediaPath string) string {
+	base := path.Base(mediaPath)
+	dir := path.Dir(mediaPath)
+	if !strings.HasPrefix(base, "~") {
+		return path.Join(dir, "~"+base)
+	}
+	return mediaPath
+}
+
+func SwitchBolanghao(mediaPath string) string {
+	base := path.Base(mediaPath)
+	dir := path.Dir(mediaPath)
+	if strings.HasPrefix(base, "~") {
+		return path.Join(dir, strings.TrimPrefix(base, "~"))
+	}
+	return path.Join(dir, "~"+base)
 }

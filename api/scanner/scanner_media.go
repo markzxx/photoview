@@ -2,6 +2,7 @@ package scanner
 
 import (
 	"context"
+	"github.com/photoview/photoview/api/utils"
 	"log"
 	"os"
 	"path"
@@ -21,7 +22,7 @@ func ScanMedia(tx *gorm.DB, mediaPath string, albumId int, cache *scanner_cache.
 	{
 		var media []*models.Media
 
-		result := tx.Where("path_hash = ?", models.MD5Hash(mediaPath)).Find(&media)
+		result := tx.Where("path_hash = ?", models.MD5Hash(utils.RemoveBolanghao(mediaPath))).Find(&media)
 
 		if result.Error != nil {
 			return nil, false, errors.Wrap(result.Error, "scan media fetch from database")
@@ -29,6 +30,11 @@ func ScanMedia(tx *gorm.DB, mediaPath string, albumId int, cache *scanner_cache.
 
 		if result.RowsAffected > 0 {
 			// log.Printf("Media already scanned: %s\n", mediaPath)
+			if media[0].Title != mediaName {
+				media[0].Title = mediaName
+				media[0].Path = mediaPath
+				tx.Save(&media[0])
+			}
 			return media[0], false, nil
 		}
 	}

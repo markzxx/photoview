@@ -3,6 +3,7 @@ package resolvers
 import (
 	"context"
 	"fmt"
+	"github.com/photoview/photoview/api/utils"
 	"io"
 	"io/ioutil"
 	"os"
@@ -122,6 +123,26 @@ func (r *mutationResolver) MakeFinalDir(ctx context.Context, albumID int) (int, 
 			CopyDir(path.Join(album.Path, item.Name()), path.Join(newRootPath, item.Name()))
 		} else {
 			CopyFile(path.Join(album.Path, item.Name()), path.Join(newOriginPath, item.Name()))
+		}
+	}
+
+	return 0, nil
+}
+
+func (r *mutationResolver) MarkRetouchFile(ctx context.Context, albumID int) (int, error) {
+	album := &models.Album{}
+	db := r.DB(ctx)
+	db.First(album, albumID)
+
+	var medias []models.Media
+	db.Where("album_id = ?", albumID).Find(&medias)
+	for _, media := range medias {
+		var favorite models.UserMediaData
+		db.Where("media_id = ?", media.ID).First(&favorite)
+		if favorite.Favorite {
+			os.Rename(media.Path, utils.RemoveBolanghao(media.Path))
+		} else {
+			os.Rename(media.Path, utils.AddBolanghao(media.Path))
 		}
 	}
 
