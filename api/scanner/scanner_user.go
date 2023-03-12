@@ -99,7 +99,6 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 	}
 
 	needScanAlbums := make([]*models.Album, 0)
-	isFirst := firstScan()
 	for scanQueue.Front() != nil {
 		skip := false
 		albumInfo := scanQueue.Front().Value.(scanInfo)
@@ -174,7 +173,7 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 					tx.Model(&album).Update("last_modify_time", albumInfo.lastModifyTime)
 					album.LastModifyTime = &albumInfo.lastModifyTime
 				}
-				if !isFirst && !scan_all && album.LastModifyTime != nil && album.LastLastModifyTime != nil && *album.LastModifyTime == *album.LastLastModifyTime {
+				if !scan_all && album.LastModifyTime != nil && album.LastLastModifyTime != nil && *album.LastModifyTime == *album.LastLastModifyTime {
 					//log.Printf("Skip directory: %s", albumPath)
 					skip = true
 				} else {
