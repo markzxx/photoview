@@ -14,11 +14,12 @@ type Album struct {
 	ParentAlbum   *Album `gorm:"constraint:OnDelete:SET NULL;"`
 	// OwnerID       int `gorm:"not null"`
 	// Owner         User
-	Owners         []User `gorm:"many2many:user_albums;constraint:OnDelete:CASCADE;"`
-	Path           string `gorm:"not null"`
-	PathHash       string `gorm:"unique"`
-	CoverID        *int
-	LastModifyTime *int
+	Owners             []User `gorm:"many2many:user_albums;constraint:OnDelete:CASCADE;"`
+	Path               string `gorm:"not null"`
+	PathHash           string `gorm:"unique"`
+	CoverID            *int
+	LastModifyTime     *int
+	LastLastModifyTime *int
 }
 
 func (a *Album) FilePath() string {

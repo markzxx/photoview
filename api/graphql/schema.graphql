@@ -354,6 +354,8 @@ type Album {
   shares: [ShareToken!]!
   "Last modify time"
   lastModifyTime: Int
+  "Last modify time"
+  lastLastModifyTime: Int
 }
 
 type MediaURL {

@@ -4,6 +4,7 @@ import (
 	"github.com/photoview/photoview/api/graphql/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"time"
 )
 
 func MyAlbums(db *gorm.DB, user *models.User, order *models.Ordering, paginate *models.Pagination, onlyRoot *bool, showEmpty *bool, onlyWithFavorites *bool) ([]*models.Album, error) {
@@ -20,7 +21,7 @@ func MyAlbums(db *gorm.DB, user *models.User, order *models.Ordering, paginate *
 		userAlbumIDs[i] = album.ID
 	}
 
-	query := db.Model(models.Album{}).Where("id IN (?)", userAlbumIDs)
+	query := db.Model(models.Album{}).Where("id IN (?)", userAlbumIDs).Where("last_modify_time > ?", time.Now().UTC().Unix()-3*24*60*60)
 
 	if onlyRoot != nil && *onlyRoot {
 

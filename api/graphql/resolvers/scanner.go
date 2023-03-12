@@ -100,7 +100,7 @@ func (r *mutationResolver) MarkModify(ctx context.Context, modPath string) (int,
 		var album models.Album
 		err := db.Where("path_hash = ?", models.MD5Hash(modPath)).First(&album).Error
 		if err == nil {
-			db.Model(&album).Update("last_modify_time", 1)
+			db.Model(&album).Update("last_modify_time", time.Now().UTC().Unix())
 		}
 		modPath = path.Dir(modPath)
 	}
