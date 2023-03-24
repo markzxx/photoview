@@ -253,7 +253,6 @@ func FindAlbumsForUser(db *gorm.DB, user *models.User, album_cache *scanner_cach
 		deleteErrors := cleanup_tasks.DeleteOldUserAlbums(db, user)
 		scanErrors = append(scanErrors, deleteErrors...)
 	}
-	log.Printf("Real scan albums: %v", len(needScanAlbums))
 	return needScanAlbums, scanErrors
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/photoview/photoview/api/scanner"
 	"log"
 	"net/http"
 	"path"
@@ -61,6 +62,12 @@ func main() {
 	if err := face_detection.InitializeFaceDetector(db); err != nil {
 		log.Panicf("Could not initialize face detector: %s\n", err)
 	}
+
+	if err := scanner.InitFsNotify(db); err != nil {
+		log.Panicf("Could not init fs notify: %v\n", err)
+	}
+
+	scanner_queue.AddAllToQueue(true)
 
 	rootRouter := mux.NewRouter()
 

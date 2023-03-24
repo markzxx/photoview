@@ -96,14 +96,14 @@ func IsDirSymlink(path string) (bool, error) {
 }
 
 func RemoveBolanghao(mediaPath string) string {
-	base := path.Base(mediaPath)
 	dir := path.Dir(mediaPath)
+	base := path.Base(mediaPath)
 	return path.Join(dir, strings.TrimPrefix(base, "~"))
 }
 
 func AddBolanghao(mediaPath string) string {
-	base := path.Base(mediaPath)
 	dir := path.Dir(mediaPath)
+	base := path.Base(mediaPath)
 	if !strings.HasPrefix(base, "~") {
 		return path.Join(dir, "~"+base)
 	}
@@ -111,8 +111,8 @@ func AddBolanghao(mediaPath string) string {
 }
 
 func SwitchBolanghao(mediaPath string) string {
-	base := path.Base(mediaPath)
 	dir := path.Dir(mediaPath)
+	base := path.Base(mediaPath)
 	if strings.HasPrefix(base, "~") {
 		return path.Join(dir, strings.TrimPrefix(base, "~"))
 	}

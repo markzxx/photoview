@@ -3,11 +3,12 @@ module github.com/photoview/photoview/api
 go 1.18
 
 require (
-	github.com/99designs/gqlgen v0.17.24
+	github.com/99designs/gqlgen v0.17.26
 	github.com/Kagami/go-face v0.0.0-20210630145111-0c14797b4d0e
 	github.com/barasher/go-exiftool v1.8.0
 	github.com/buckket/go-blurhash v1.1.0
 	github.com/disintegration/imaging v1.6.2
+	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
@@ -17,7 +18,7 @@ require (
 	github.com/otiai10/copy v1.7.0
 	github.com/pkg/errors v0.9.1
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.2
 	github.com/strukturag/libheif v1.12.0
 	github.com/vektah/gqlparser/v2 v2.5.1
 	github.com/wsxiaoys/terminal v0.0.0-20160513160801-0940f3fc43a0
@@ -29,13 +30,14 @@ require (
 	gorm.io/driver/postgres v1.3.8
 	gorm.io/driver/sqlite v1.3.5
 	gorm.io/gorm v1.23.7
+	k8s.io/utils v0.0.0-20230313181309-38a27ef9d749
 )
 
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
-	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.1 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.12.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -49,6 +51,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.14 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	golang.org/x/text v0.3.8 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
