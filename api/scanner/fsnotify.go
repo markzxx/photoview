@@ -48,6 +48,9 @@ func InitFsNotify(db *gorm.DB) error {
 			case e := <-watcher.Event:
 				dir := path.Dir(e.Name)
 				base := path.Base(e.Name)
+				if strings.HasSuffix(e.Name, "tmp") {
+					continue
+				}
 				if is(e, inotify.InCloseWrite) || is(e, inotify.InMovedTo) {
 					log.Println("Create file", e.Name)
 					// 删除多余文件
