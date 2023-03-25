@@ -67,7 +67,7 @@ func main() {
 		log.Panicf("Could not init fs notify: %v\n", err)
 	}
 
-	scanner_queue.AddAllToQueue(true)
+	go scanner_queue.AddAllToQueue(true)
 
 	rootRouter := mux.NewRouter()
 
