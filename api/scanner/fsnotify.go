@@ -104,7 +104,7 @@ func InitFsNotify(db *gorm.DB) error {
 					db.Create(album)
 					parentOwners := []models.User{user}
 					db.Model(&album).Association("Owners").Append(parentOwners)
-				} else if is(e, inotify.InDelete) || is(e, inotify.InMovedFrom) {
+				} else if is(e, inotify.InDelete) {
 					log.Println("delete file", e.Name)
 					var media models.Media
 					result := db.Where("path_hash = ?", models.MD5Hash(utils.RemoveBolanghao(e.Name))).First(&media)

@@ -3,12 +3,11 @@ module github.com/photoview/photoview/api
 go 1.18
 
 require (
-	github.com/99designs/gqlgen v0.17.26
+	github.com/99designs/gqlgen v0.17.27
 	github.com/Kagami/go-face v0.0.0-20210630145111-0c14797b4d0e
 	github.com/barasher/go-exiftool v1.8.0
 	github.com/buckket/go-blurhash v1.1.0
 	github.com/disintegration/imaging v1.6.2
-	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
@@ -51,7 +50,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.14 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -134,15 +135,15 @@ func (p *MediaURL) CachedPath() (string, error) {
 		return "", errors.New("mediaURL.Media is nil")
 	}
 
-	if p.Purpose == PhotoThumbnail || p.Purpose == PhotoHighRes || p.Purpose == VideoThumbnail || p.Purpose == VideoWeb {
+	if p.Purpose == PhotoThumbnail || p.Purpose == VideoThumbnail || p.Purpose == VideoWeb {
 		cachedPath = path.Join(utils.MediaCachePath(), strconv.Itoa(int(p.Media.AlbumID)), strconv.Itoa(int(p.MediaID)), p.MediaName)
-	} else if p.Purpose == MediaOriginal {
+	} else if p.Purpose == PhotoHighRes || p.Purpose == MediaOriginal {
 		{
 			cachedPath = p.Media.Path
-			//_, err := os.Stat(cachedPath)
-			//if err != nil {
-			//	cachedPath = utils.SwitchBolanghao(cachedPath)
-			//}
+			_, err := os.Stat(cachedPath)
+			if err != nil {
+				cachedPath = utils.SwitchBolanghao(cachedPath)
+			}
 		}
 	} else {
 		return "", errors.New(fmt.Sprintf("cannot determine cache path for purpose (%s)", p.Purpose))

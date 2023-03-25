@@ -47,6 +47,9 @@ export const MEDIA_GALLERY_FRAGMENT = gql`
     highRes {
       url
     }
+    original {
+      url
+    }
     videoWeb {
       url
     }

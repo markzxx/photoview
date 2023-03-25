@@ -159,6 +159,14 @@ func (r *mediaResolver) HighRes(ctx context.Context, media *models.Media) (*mode
 	return dataloader.For(ctx).MediaHighres.Load(media.ID)
 }
 
+func (r *mediaResolver) Original(ctx context.Context, media *models.Media) (*models.MediaURL, error) {
+	if media.Type != models.MediaTypePhoto {
+		return nil, nil
+	}
+
+	return dataloader.For(ctx).MediaOriginal.Load(media.ID)
+}
+
 func (r *mediaResolver) Thumbnail(ctx context.Context, media *models.Media) (*models.MediaURL, error) {
 	return dataloader.For(ctx).MediaThumbnail.Load(media.ID)
 }

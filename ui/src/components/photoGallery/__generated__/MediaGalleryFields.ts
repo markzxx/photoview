@@ -33,6 +33,14 @@ export interface MediaGalleryFields_highRes {
   url: string;
 }
 
+export interface MediaGalleryFields_original {
+  __typename: "MediaURL";
+  /**
+   * URL for previewing the image
+   */
+  url: string;
+}
+
 export interface MediaGalleryFields_videoWeb {
   __typename: "MediaURL";
   /**
@@ -58,6 +66,8 @@ export interface MediaGalleryFields {
    * URL to display the photo in full resolution, will be null for videos
    */
   highRes: MediaGalleryFields_highRes | null;
+  original: MediaGalleryFields_original | null;
+
   /**
    * URL to get the video in a web format that can be played in the browser, will be null for photos
    */

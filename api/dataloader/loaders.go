@@ -13,6 +13,7 @@ const loadersKey = "dataloaders"
 type Loaders struct {
 	MediaThumbnail      *MediaURLLoader
 	MediaHighres        *MediaURLLoader
+	MediaOriginal       *MediaURLLoader
 	MediaVideoWeb       *MediaURLLoader
 	UserFromAccessToken *UserLoader
 	UserMediaFavorite   *UserFavoritesLoader
@@ -25,6 +26,7 @@ func Middleware(db *gorm.DB) mux.MiddlewareFunc {
 			ctx := context.WithValue(r.Context(), loadersKey, &Loaders{
 				MediaThumbnail:      NewThumbnailMediaURLLoader(db),
 				MediaHighres:        NewHighresMediaURLLoader(db),
+				MediaOriginal:       NewOriginalMediaURLLoader(db),
 				MediaVideoWeb:       NewVideoWebMediaURLLoader(db),
 				UserFromAccessToken: NewUserLoaderByToken(db),
 				UserMediaFavorite:   NewUserFavoriteLoader(db),

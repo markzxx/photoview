@@ -45,7 +45,7 @@ const PresentMedia = ({
           <StyledPhoto
             key={`${media.id}-highres`}
             style={{ display: 'none' }}
-            src={media.highRes?.url}
+            src={media.original?.url}
             data-testid="present-img-highres"
             onLoad={e => {
               const elem = e.target as HTMLImageElement

@@ -61,6 +61,16 @@ func NewHighresMediaURLLoader(db *gorm.DB) *MediaURLLoader {
 	}
 }
 
+func NewOriginalMediaURLLoader(db *gorm.DB) *MediaURLLoader {
+	return &MediaURLLoader{
+		maxBatch: 100,
+		wait:     5 * time.Millisecond,
+		fetch: makeMediaURLLoader(db, func(query *gorm.DB) *gorm.DB {
+			return query.Where("purpose = ? OR (purpose = ? AND content_type IN ?)", models.MediaOriginal, models.MediaOriginal, media_type.WebMimetypes)
+		}),
+	}
+}
+
 func NewVideoWebMediaURLLoader(db *gorm.DB) *MediaURLLoader {
 	return &MediaURLLoader{
 		maxBatch: 100,
