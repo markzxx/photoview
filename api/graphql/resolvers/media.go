@@ -222,22 +222,16 @@ func (r *mutationResolver) DeleteMedia(ctx context.Context, mediaID int) (*model
 		return nil, errors.Wrap(err, "get media from database")
 	}
 
-	reyclePath := path.Join(utils.RecyclePath(), media.Path)
-	err1 := os.MkdirAll(path.Dir(reyclePath), os.ModePerm)
-	err := os.Rename(media.Path, reyclePath)
-	if err1 != nil || err != nil {
-		return nil, errors.Wrapf(err, "remove file to recycle folder (%s)", reyclePath)
-	}
-
-	cachePath := path.Join(utils.MediaCachePath(), strconv.Itoa(int(media.AlbumID)), strconv.Itoa(int(media.ID)))
-	err = os.RemoveAll(cachePath)
-	if err != nil {
-		return nil, errors.Wrapf(err, "delete unused cache folder (%s)", cachePath)
-	}
-
 	if err := r.DB(ctx).Delete(media).Error; err != nil {
 		return nil, errors.Wrap(err, "delete media from database")
 	}
+
+	reyclePath := path.Join(utils.RecyclePath(), media.Path)
+	os.MkdirAll(path.Dir(reyclePath), os.ModePerm)
+	os.Rename(media.Path, reyclePath)
+
+	cachePath := path.Join(utils.MediaCachePath(), strconv.Itoa(int(media.AlbumID)), strconv.Itoa(int(media.ID)))
+	os.RemoveAll(cachePath)
 
 	r.DB(ctx).First(&album, media.AlbumID)
 
