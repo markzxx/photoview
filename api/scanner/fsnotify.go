@@ -84,8 +84,10 @@ func InitFsNotify(db *gorm.DB) error {
 						continue
 					}
 					db.Model(&album).Update("last_modify_time", time.Now().UTC().Unix())
-					media, _, _ := ScanMedia(db, e.Name, album.ID, scanner_cache.MakeAlbumCache())
-					ProcessSingleMedia(db, media)
+					media, ok, _ := ScanMedia(db, e.Name, album.ID, scanner_cache.MakeAlbumCache())
+					if ok {
+						ProcessSingleMedia(db, media)
+					}
 				} else if hasAnd(e, inotify.InCreate, inotify.InIsdir) || hasAnd(e, inotify.InMovedTo, inotify.InIsdir) {
 					log.Println("Create dir", e.Name)
 					watcher.Watch(e.Name)
