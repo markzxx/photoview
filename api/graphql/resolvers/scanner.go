@@ -6,6 +6,7 @@ import (
 	"github.com/photoview/photoview/api/utils"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"time"
@@ -114,6 +115,12 @@ func (r *mutationResolver) MakeFinalDir(ctx context.Context, albumID int) (int, 
 	album := &models.Album{}
 	db := r.DB(ctx)
 	db.First(album, albumID)
+	if album.Title == "精修图片" {
+		parent := &models.Album{}
+		db.First(parent, album.ParentAlbumID)
+		album = parent
+		log.Println("find parent dir", album.Title)
+	}
 	newRootPath := path.Join(finalDir, album.Title)
 	newOriginPath := path.Join(newRootPath, "原图")
 	os.MkdirAll(newOriginPath, os.ModePerm)

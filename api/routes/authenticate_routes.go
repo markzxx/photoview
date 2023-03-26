@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/pkg/errors"
 	"net/http"
 
 	"github.com/photoview/photoview/api/graphql/auth"
@@ -9,6 +10,9 @@ import (
 )
 
 func authenticateMedia(media *models.Media, db *gorm.DB, r *http.Request) (success bool, responseMessage string, responseStatus int, errorMessage error) {
+	if media == nil {
+		return false, "internal server error", http.StatusInternalServerError, errors.New("media not found")
+	}
 	user := auth.UserFromContext(r.Context())
 
 	if user != nil {

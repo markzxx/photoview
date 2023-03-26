@@ -4,6 +4,7 @@ import (
 	"github.com/photoview/photoview/api/scanner"
 	"log"
 	"net/http"
+	"os"
 	"path"
 
 	"github.com/gorilla/handlers"
@@ -28,7 +29,15 @@ import (
 )
 
 func main() {
-
+	LOG_FILE := "/log"
+	// open log file
+	os.Remove(LOG_FILE)
+	logFile, err := os.OpenFile(LOG_FILE, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile)
 	log.Println("Starting Photoview...")
 
 	if err := godotenv.Load(); err != nil {

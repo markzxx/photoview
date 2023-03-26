@@ -33,8 +33,6 @@ func (t ProcessPhotoTask) ProcessMedia(ctx scanner_task.TaskContext, mediaData *
 	updatedURLs := make([]*models.MediaURL, 0)
 	photo := mediaData.Media
 
-	log.Printf("Processing photo: %s\n", photo.Path)
-
 	photoURLFromDB := makePhotoURLChecker(ctx.GetDB(), photo.ID)
 
 	// original photo url
@@ -60,7 +58,6 @@ func (t ProcessPhotoTask) ProcessMedia(ctx scanner_task.TaskContext, mediaData *
 
 	// Generate high res jpeg
 	if highResURL == nil {
-
 		contentType, err := mediaData.ContentType()
 		if err != nil {
 			return []*models.MediaURL{}, err
@@ -94,6 +91,7 @@ func (t ProcessPhotoTask) ProcessMedia(ctx scanner_task.TaskContext, mediaData *
 
 	// Save original photo to database
 	if origURL == nil {
+		log.Printf("Processing orginal photo: %s\n", photo.Path)
 
 		// Make sure photo dimensions is set
 		if photoDimensions == nil {
@@ -113,6 +111,8 @@ func (t ProcessPhotoTask) ProcessMedia(ctx scanner_task.TaskContext, mediaData *
 
 	// Save thumbnail to cache
 	if thumbURL == nil {
+		log.Printf("Processing thumbnail photo: %s\n", photo.Path)
+
 		thumbnailName := generateUniqueMediaNamePrefixed("thumbnail", photo.Path, ".jpg")
 		thumbnail, err := generateSaveThumbnailJPEG(ctx.GetDB(), photo, thumbnailName, mediaCachePath, baseImagePath, nil)
 		if err != nil {
