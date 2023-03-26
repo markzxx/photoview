@@ -118,7 +118,7 @@ func InitFsNotify(db *gorm.DB) error {
 					log.Println("delete dir", e.Name)
 					watcher.RemoveWatch(e.Name)
 					var album models.Album
-					if err := db.Where("path_hash = ?", models.MD5Hash(dir)).Find(&album).Error; err != nil {
+					if err := db.Where("path_hash = ?", models.MD5Hash(e.Name)).Find(&album).Error; err != nil {
 						continue
 					}
 					cachePath := path.Join(utils.MediaCachePath(), strconv.Itoa(int(album.ID)))
