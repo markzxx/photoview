@@ -105,6 +105,9 @@ func createFile(watcher *inotify.Watcher, db *gorm.DB, user *models.User, filePa
 		os.Remove(utils.SwitchBolanghao(filePath))
 	}
 
+	if strings.Contains(base, "云修") {
+		return
+	}
 	if _, err := os.Stat(filePath); err != nil {
 		return
 	}

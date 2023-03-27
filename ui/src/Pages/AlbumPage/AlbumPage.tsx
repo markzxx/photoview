@@ -59,6 +59,7 @@ function AlbumPage() {
       offset: 0,
       limit: 200,
     },
+    fetchPolicy: 'cache-and-network',
   })
 
   const { containerElem, finished: finishedLoadingMore } =

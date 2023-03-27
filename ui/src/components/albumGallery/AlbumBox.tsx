@@ -30,7 +30,7 @@ const AlbumBoxImage = ({ src, ...props }: AlbumBoxImageProps) => {
   }
 
   return (
-    <div className="xs:w-[220px] xs:h-[220px] relative rounded-lg">
+    <div className="xs:w-[220px] xs:h-[300px] relative rounded-lg">
       {image}
       {placeholder}
     </div>
