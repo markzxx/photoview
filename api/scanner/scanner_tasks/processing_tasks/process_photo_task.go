@@ -2,7 +2,6 @@ package processing_tasks
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path"
 
@@ -91,8 +90,6 @@ func (t ProcessPhotoTask) ProcessMedia(ctx scanner_task.TaskContext, mediaData *
 
 	// Save original photo to database
 	if origURL == nil {
-		log.Printf("Processing orginal photo: %s\n", photo.Path)
-
 		// Make sure photo dimensions is set
 		if photoDimensions == nil {
 			photoDimensions, err = media_utils.GetPhotoDimensions(baseImagePath)
@@ -111,8 +108,6 @@ func (t ProcessPhotoTask) ProcessMedia(ctx scanner_task.TaskContext, mediaData *
 
 	// Save thumbnail to cache
 	if thumbURL == nil {
-		log.Printf("Processing thumbnail photo: %s\n", photo.Path)
-
 		thumbnailName := generateUniqueMediaNamePrefixed("thumbnail", photo.Path, ".jpg")
 		thumbnail, err := generateSaveThumbnailJPEG(ctx.GetDB(), photo, thumbnailName, mediaCachePath, baseImagePath, nil)
 		if err != nil {

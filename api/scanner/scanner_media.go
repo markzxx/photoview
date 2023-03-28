@@ -2,17 +2,16 @@ package scanner
 
 import (
 	"context"
-	"github.com/photoview/photoview/api/utils"
-	"log"
-	"os"
-	"path"
-
 	"github.com/photoview/photoview/api/graphql/models"
 	"github.com/photoview/photoview/api/scanner/media_encoding"
 	"github.com/photoview/photoview/api/scanner/scanner_cache"
 	"github.com/photoview/photoview/api/scanner/scanner_task"
+	"github.com/photoview/photoview/api/utils"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"log"
+	"os"
+	"path"
 )
 
 func ScanMedia(tx *gorm.DB, mediaPath string, albumId int, cache *scanner_cache.AlbumScannerCache) (*models.Media, bool, error) {
@@ -76,17 +75,19 @@ func ScanMedia(tx *gorm.DB, mediaPath string, albumId int, cache *scanner_cache.
 
 // ProcessSingleMedia processes a single media, might be used to reprocess media with corrupted cache
 // Function waits for processing to finish before returning.
-func ProcessSingleMedia(db *gorm.DB, media *models.Media) error {
+func ProcessSingleMedia(db *gorm.DB, media *models.Media, album *models.Album) error {
 	album_cache := scanner_cache.MakeAlbumCache()
 
-	var album models.Album
-	if err := db.Model(media).Association("Album").Find(&album); err != nil {
-		return err
+	if album == nil {
+		album = &models.Album{}
+		if err := db.Model(media).Association("Album").Find(&album); err != nil {
+			return err
+		}
 	}
 
 	media_data := media_encoding.NewEncodeMediaData(media)
 
-	task_context := scanner_task.NewTaskContext(context.Background(), db, &album, album_cache)
+	task_context := scanner_task.NewTaskContext(context.Background(), db, album, album_cache)
 	if err := scanMedia(task_context, media, &media_data, 0, 1); err != nil {
 		return errors.Wrap(err, "single media scan")
 	}

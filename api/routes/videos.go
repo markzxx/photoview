@@ -51,7 +51,7 @@ func RegisterVideoRoutes(db *gorm.DB, router *mux.Router) {
 
 		if _, err := os.Stat(cachedPath); err != nil {
 			if os.IsNotExist(err) {
-				if err := scanner.ProcessSingleMedia(db, media); err != nil {
+				if err := scanner.ProcessSingleMedia(db, media, nil); err != nil {
 					log.Printf("ERROR: processing video not found in cache: %s\n", err)
 					w.WriteHeader(http.StatusInternalServerError)
 					w.Write([]byte("internal server error"))

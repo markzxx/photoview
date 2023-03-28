@@ -17,6 +17,8 @@ import (
 	"time"
 )
 
+const watchFlag = inotify.InCloseWrite | inotify.InMovedTo | inotify.InCreate | inotify.InDelete | inotify.InMovedFrom
+
 func InitFsNotify(db *gorm.DB) error {
 	watcher, err := inotify.NewWatcher()
 	if err != nil {
@@ -33,7 +35,7 @@ func InitFsNotify(db *gorm.DB) error {
 		filepath.WalkDir(album.Path, func(path string, d fs.DirEntry, err error) error {
 			if d.IsDir() {
 				log.Println("adding", path)
-				err := watcher.Watch(path)
+				err := watcher.AddWatch(path, watchFlag)
 				if err != nil {
 					log.Println(err)
 				}
@@ -112,14 +114,14 @@ func createFile(watcher *inotify.Watcher, db *gorm.DB, user *models.User, filePa
 		return
 	}
 	// 添加新图片
-	var album models.Album
-	if err := db.Where("path_hash = ?", models.MD5Hash(dir)).Find(&album).Error; err != nil {
+	var album *models.Album
+	if err := db.Where("path_hash = ?", models.MD5Hash(dir)).Find(album).Error; err != nil {
 		return
 	}
-	db.Model(&album).Update("last_modify_time", time.Now().UTC().Unix())
+	db.Model(album).Update("last_modify_time", time.Now().UTC().Unix())
 	media, ok, _ := ScanMedia(db, filePath, album.ID, scanner_cache.MakeAlbumCache())
 	if ok {
-		ProcessSingleMedia(db, media)
+		ProcessSingleMedia(db, media, album)
 	}
 }
 
@@ -128,7 +130,7 @@ func createDir(watcher *inotify.Watcher, db *gorm.DB, user *models.User, filePat
 	dir := path.Dir(filePath)
 	base := path.Base(filePath)
 	log.Println("Create dir", filePath)
-	watcher.Watch(filePath)
+	watcher.AddWatch(filePath, watchFlag)
 	var albumParent models.Album
 	if err := db.Where("path_hash = ?", models.MD5Hash(dir)).Find(&albumParent).Error; err != nil {
 		return
