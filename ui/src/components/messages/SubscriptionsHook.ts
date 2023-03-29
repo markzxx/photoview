@@ -44,6 +44,7 @@ const SubscriptionsHook = ({
   messages,
   setMessages,
 }: SubscriptionHookProps) => {
+  return null
   if (!authToken()) {
     return null
   }
