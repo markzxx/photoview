@@ -108,22 +108,25 @@ func createFile(watcher *inotify.Watcher, db *gorm.DB, user *models.User, filePa
 	}
 
 	if strings.Contains(base, "云修") {
+		log.Println("Create error contains 云修,", filePath)
 		return
 	}
 	if _, err := os.Stat(filePath); err != nil {
+		log.Println("Create error not exist,", filePath)
 		return
 	}
 	// 添加新图片
 	var album *models.Album
 	if err := db.Where("path_hash = ?", models.MD5Hash(dir)).Find(album).Error; err != nil {
+		log.Println("Create error album not found,", dir)
 		return
 	}
 	db.Model(album).Update("last_modify_time", time.Now().UTC().Unix())
 	media, ok, _ := ScanMedia(db, filePath, album.ID, scanner_cache.MakeAlbumCache())
-	log.Println("ScanMedia path=[%v] ok=[%v]", filePath, ok)
+	log.Printf("ScanMedia path=[%v] ok=[%v]\n", filePath, ok)
 	if ok {
 		err := ProcessSingleMedia(db, media, album)
-		log.Println("ProcessSingleMedia path[%v] err=[%v]", filePath, err)
+		log.Printf("ProcessSingleMedia path[%v] err=[%v]\n", filePath, err)
 	}
 }
 
