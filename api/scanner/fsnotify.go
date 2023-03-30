@@ -120,8 +120,10 @@ func createFile(watcher *inotify.Watcher, db *gorm.DB, user *models.User, filePa
 	}
 	db.Model(album).Update("last_modify_time", time.Now().UTC().Unix())
 	media, ok, _ := ScanMedia(db, filePath, album.ID, scanner_cache.MakeAlbumCache())
+	log.Println("ScanMedia path=[%v] ok=[%v]", filePath, ok)
 	if ok {
-		ProcessSingleMedia(db, media, album)
+		err := ProcessSingleMedia(db, media, album)
+		log.Println("ProcessSingleMedia path[%v] err=[%v]", filePath, err)
 	}
 }
 
