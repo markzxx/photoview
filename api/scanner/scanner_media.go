@@ -78,9 +78,11 @@ func ScanMedia(tx *gorm.DB, mediaPath string, albumId int, cache *scanner_cache.
 func ProcessSingleMedia(db *gorm.DB, media *models.Media, album *models.Album) error {
 	album_cache := scanner_cache.MakeAlbumCache()
 
-	album = &models.Album{}
-	if err := db.Model(media).Association("Album").Find(&album); err != nil {
-		return err
+	if album == nil {
+		album = &models.Album{}
+		if err := db.Model(media).Association("Album").Find(&album); err != nil {
+			return err
+		}
 	}
 
 	media_data := media_encoding.NewEncodeMediaData(media)
