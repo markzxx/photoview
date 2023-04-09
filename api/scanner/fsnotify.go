@@ -33,7 +33,7 @@ func InitFsNotify(db *gorm.DB) error {
 			continue
 		}
 		filepath.WalkDir(album.Path, func(path string, d fs.DirEntry, err error) error {
-			if d.IsDir() {
+			if d != nil && d.IsDir() {
 				log.Println("adding", path)
 				err := watcher.AddWatch(path, watchFlag)
 				if err != nil {
