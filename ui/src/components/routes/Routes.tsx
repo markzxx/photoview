@@ -14,7 +14,10 @@ import Loader from '../../primitives/Loader'
 import AuthorizedRoute from './AuthorizedRoute'
 
 const AlbumsPage = React.lazy(
-  () => import('../../Pages/AllAlbumsPage/AlbumsPage')
+  () => import('../../Pages/AlbumsPage/AlbumsPage')
+)
+const AllAlbumsPage = React.lazy(
+    () => import('../../Pages/AllAlbumsPage/AlbumsPage')
 )
 const AlbumPage = React.lazy(() => import('../../Pages/AlbumPage/AlbumPage'))
 
@@ -55,6 +58,10 @@ const Routes = () => {
     {
       path: '/albums',
       element: authorized(<AlbumsPage />),
+    },
+    {
+      path: '/allalbums',
+      element: authorized(<AllAlbumsPage/>),
     },
     {
       path: '/album/:id',
