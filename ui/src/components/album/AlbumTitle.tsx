@@ -1,22 +1,22 @@
-import React, { useEffect, useContext } from 'react'
-import { Link } from 'react-router-dom'
+import React, {useEffect, useContext} from 'react'
+import {Link} from 'react-router-dom'
 import styled from 'styled-components'
-import { SidebarContext } from '../sidebar/Sidebar'
+import {SidebarContext} from '../sidebar/Sidebar'
 import AlbumSidebar from '../sidebar/AlbumSidebar'
-import { useLazyQuery, gql, MutationFunction, useMutation } from '@apollo/client'
-import { authToken } from '../../helpers/authentication'
-import { albumPathQuery } from './__generated__/albumPathQuery'
+import {useLazyQuery, gql, MutationFunction, useMutation} from '@apollo/client'
+import {authToken} from '../../helpers/authentication'
+import {albumPathQuery} from './__generated__/albumPathQuery'
 import useDelay from '../../hooks/useDelay'
 
-import { ReactComponent as GearIcon } from './icons/gear.svg'
-import { tailwindClassNames } from '../../helpers/utils'
-import { buttonStyles } from '../../primitives/form/Input'
+import {ReactComponent as GearIcon} from './icons/gear.svg'
+import {tailwindClassNames} from '../../helpers/utils'
+import {buttonStyles} from '../../primitives/form/Input'
 import {MediaGalleryFields} from "../photoGallery/__generated__/MediaGalleryFields";
 
 export const BreadcrumbList = styled.ol<{ hideLastArrow?: boolean }>`
   &
-    ${({ hideLastArrow }) =>
-      hideLastArrow ? 'li:not(:last-child)::after' : 'li::after'} {
+    ${({hideLastArrow}) =>
+    hideLastArrow ? 'li:not(:last-child)::after' : 'li::after'} {
     content: '';
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='5px' height='6px' viewBox='0 0 5 6'%3E%3Cpolyline fill='none' stroke='%23979797' points='0.74 0.167710644 3.57228936 3 0.74 5.83228936' /%3E%3C/svg%3E");
     width: 5px;
@@ -52,114 +52,114 @@ const ALBUM_PATH_QUERY = gql`
 `
 
 type AlbumTitleProps = {
-  album?: {
-    id: string
-    title: string
-  }
-  disableLink: boolean
+    album?: {
+        id: string
+        title: string
+    }
+    disableLink: boolean
 }
 
-const AlbumTitle = ({ album, disableLink = false }: AlbumTitleProps) => {
-  const [fetchPath, { data: pathData }] =
-    useLazyQuery<albumPathQuery>(ALBUM_PATH_QUERY)
+const AlbumTitle = ({album, disableLink = false}: AlbumTitleProps) => {
+    const [fetchPath, {data: pathData}] =
+        useLazyQuery<albumPathQuery>(ALBUM_PATH_QUERY)
 
-  const [makeFinalDir] = useMutation(makeFinalDirMutation);
-  const [markRetouchFile] = useMutation(markRetouchFileMutation);
+    const [makeFinalDir] = useMutation(makeFinalDirMutation);
+    const [markRetouchFile] = useMutation(markRetouchFileMutation);
 
-  useEffect(() => {
-    if (!album) return
+    useEffect(() => {
+        if (!album) return
 
-    if (authToken() && disableLink == true) {
-      fetchPath({
-        variables: {
-          id: album.id,
-        },
-      })
+        if (authToken() && disableLink == true) {
+            fetchPath({
+                variables: {
+                    id: album.id,
+                },
+            })
+        }
+    }, [album])
+
+    const delay = useDelay(200, [album])
+
+    if (!album) {
+        return (
+            <div
+                className={`flex mb-6 flex-col h-14 transition-opacity animate-pulse ${
+                    delay ? 'opacity-100' : 'opacity-0'
+                }`}
+            >
+                <div className="w-32 h-4 bg-gray-100 mb-2 mt-1"></div>
+                <div className="w-72 h-6 bg-gray-100"></div>
+            </div>
+        )
     }
-  }, [album])
 
-  const delay = useDelay(200, [album])
+    let title = <span>{album.title}</span>
 
-  if (!album) {
+    const path = pathData?.album.path || []
+
+    const breadcrumbSections = path
+        .slice()
+        .reverse()
+        .map(x => (
+            <li key={x.id} className="inline-block hover:underline">
+                <Link to={`/album/${x.id}`}>{x.title}</Link>
+            </li>
+        ))
+
+    if (!disableLink) {
+        title = <Link to={`/album/${album.id}`}>{title}</Link>
+    }
+
     return (
-      <div
-        className={`flex mb-6 flex-col h-14 transition-opacity animate-pulse ${
-          delay ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        <div className="w-32 h-4 bg-gray-100 mb-2 mt-1"></div>
-        <div className="w-72 h-6 bg-gray-100"></div>
-      </div>
-    )
-  }
-
-  let title = <span>{album.title}</span>
-
-  const path = pathData?.album.path || []
-
-  const breadcrumbSections = path
-    .slice()
-    .reverse()
-    .map(x => (
-      <li key={x.id} className="inline-block hover:underline">
-        <Link to={`/album/${x.id}`}>{x.title}</Link>
-      </li>
-    ))
-
-  if (!disableLink) {
-    title = <Link to={`/album/${album.id}`}>{title}</Link>
-  }
-
-  return (
-    <div className="flex mb-6 items-end h-14">
-      <div className="min-w-0">
-        <nav aria-label="Album breadcrumb">
-          <BreadcrumbList>{breadcrumbSections}</BreadcrumbList>
-        </nav>
-        <h1 className="text-2xl truncate min-w-0">{title}</h1>
-      </div>
-      {authToken() && (
-        <div>
-          <button
-            title="Album options"
-            aria-label="Album options"
-            className={tailwindClassNames(buttonStyles({}), 'px-2 py-2 ml-2')}
-            onClick={() => {
-              var r = confirm("确认复制文件夹")
-              if (r) {
-                makeFinalDir({
-                  variables: {
-                    albumId: album.id,
-                  },
-                })
-                alert("复制中, 请稍后在极空间查看")
-              }
-            }}
-          >
-            创建
-          </button>
-          <button
-            title="Album options"
-            aria-label="Album options"
-            className={tailwindClassNames(buttonStyles({}), 'px-2 py-2 ml-2')}
-            onClick={() => {
-              var r = confirm("确认选中云修文件")
-              if (r) {
-                markRetouchFile({
-                  variables: {
-                    albumId: album.id,
-                  },
-                })
-                alert("修改中, 稍后在云修中生效")
-              }
-            }}
-          >
-            云修
-          </button>
+        <div className="flex mb-6 items-end h-14">
+            <div className="min-w-0">
+                <nav aria-label="Album breadcrumb">
+                    <BreadcrumbList>{breadcrumbSections}</BreadcrumbList>
+                </nav>
+                <h1 className="text-2xl truncate min-w-0">{title}</h1>
+            </div>
+            {authToken() && (
+                <div>
+                    <button
+                        title="Album options"
+                        aria-label="Album options"
+                        className={tailwindClassNames(buttonStyles({}), 'px-2 py-2 ml-2')}
+                        onClick={() => {
+                            var r = confirm("确认复制文件夹")
+                            if (r) {
+                                makeFinalDir({
+                                    variables: {
+                                        albumId: album.id,
+                                    },
+                                })
+                                alert("复制中, 请稍后在极空间查看")
+                            }
+                        }}
+                    >
+                        创建
+                    </button>
+                    <button
+                        title="Album options"
+                        aria-label="Album options"
+                        className={tailwindClassNames(buttonStyles({}), 'px-2 py-2 ml-2')}
+                        onClick={() => {
+                            var r = confirm("确认标记选中文件")
+                            if (r) {
+                                markRetouchFile({
+                                    variables: {
+                                        albumId: album.id,
+                                    },
+                                })
+                                alert("修改中, 稍后在文件夹中生效")
+                            }
+                        }}
+                    >
+                        标记
+                    </button>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  )
+    )
 }
 
 export default AlbumTitle

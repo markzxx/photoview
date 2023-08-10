@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"runtime/debug"
 	"strconv"
 	"strings"
@@ -45,31 +46,33 @@ func InitFsNotify(db *gorm.DB) error {
 	}
 
 	go func() {
-		for {
-			do(watcher, db, user)
+		for i := 0; i < runtime.NumCPU(); i++ {
+			go worker(watcher, db, user)
 		}
 	}()
 
 	return nil
 }
 
-func do(watcher *inotify.Watcher, db *gorm.DB, user *models.User) {
-	select {
-	case e := <-watcher.Event:
-		if strings.HasSuffix(e.Name, "tmp") {
-			return
+func worker(watcher *inotify.Watcher, db *gorm.DB, user *models.User) {
+	for {
+		select {
+		case e := <-watcher.Event:
+			if strings.HasSuffix(e.Name, "tmp") {
+				return
+			}
+			if is(e, inotify.InCloseWrite) || is(e, inotify.InMovedTo) {
+				createFile(watcher, db, user, e.Name)
+			} else if hasAnd(e, inotify.InCreate, inotify.InIsdir) || hasAnd(e, inotify.InMovedTo, inotify.InIsdir) {
+				createDir(watcher, db, user, e.Name)
+			} else if is(e, inotify.InDelete) {
+				deleteFile(watcher, db, user, e.Name)
+			} else if hasAnd(e, inotify.InDelete, inotify.InIsdir) || hasAnd(e, inotify.InMovedFrom, inotify.InIsdir) {
+				deleteDir(watcher, db, user, e.Name)
+			}
+		case err := <-watcher.Error:
+			log.Println(err)
 		}
-		if is(e, inotify.InCloseWrite) || is(e, inotify.InMovedTo) {
-			go createFile(watcher, db, user, e.Name)
-		} else if hasAnd(e, inotify.InCreate, inotify.InIsdir) || hasAnd(e, inotify.InMovedTo, inotify.InIsdir) {
-			go createDir(watcher, db, user, e.Name)
-		} else if is(e, inotify.InDelete) {
-			go deleteFile(watcher, db, user, e.Name)
-		} else if hasAnd(e, inotify.InDelete, inotify.InIsdir) || hasAnd(e, inotify.InMovedFrom, inotify.InIsdir) {
-			go deleteDir(watcher, db, user, e.Name)
-		}
-	case err := <-watcher.Error:
-		log.Println(err)
 	}
 }
 
@@ -83,34 +86,10 @@ func deferFunc() {
 func createFile(watcher *inotify.Watcher, db *gorm.DB, user *models.User, filePath string) {
 	defer deferFunc()
 	dir := path.Dir(filePath)
-	base := path.Base(filePath)
 	log.Println("Create file", filePath)
 	// 删除多余文件
-	if strings.HasSuffix(dir, "精修图片") {
-		files, _ := os.ReadDir(dir)
-		count := 0
-		var deletes []string
-		for _, file := range files {
-			if strings.HasPrefix(file.Name(), base[0:6]) {
-				count += 1
-				if strings.Contains(base, "云修") {
-					deletes = append(deletes, filePath)
-				}
-			}
-		}
-		if count >= 2 {
-			for _, d := range deletes {
-				os.Remove(d)
-			}
-		}
-	} else {
-		os.Remove(utils.SwitchBolanghao(filePath))
-	}
+	os.Remove(utils.SwitchBolanghao(filePath))
 
-	if strings.Contains(base, "云修") {
-		log.Println("Create error contains 云修,", filePath)
-		return
-	}
 	if _, err := os.Stat(filePath); err != nil {
 		log.Println("Create error not exist,", filePath)
 		return
@@ -130,6 +109,11 @@ func createFile(watcher *inotify.Watcher, db *gorm.DB, user *models.User, filePa
 		}
 	} else {
 		log.Printf("ScanMedia path=[%v] ok=[%v]\n", filePath, ok)
+	}
+	result := db.First(media)
+	if result.Error != nil {
+		log.Printf("media insert fail path=[%v] err=[%v]\n", filePath, result.Error)
+		createFile(watcher, db, user, filePath)
 	}
 }
 
