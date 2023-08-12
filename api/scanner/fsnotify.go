@@ -46,7 +46,7 @@ func InitFsNotify(db *gorm.DB) error {
 	}
 
 	go func() {
-		for i := 0; i < runtime.NumCPU(); i++ {
+		for i := 0; i < runtime.NumCPU()*2; i++ {
 			go worker(watcher, db, user)
 		}
 	}()
@@ -59,7 +59,7 @@ func worker(watcher *inotify.Watcher, db *gorm.DB, user *models.User) {
 		select {
 		case e := <-watcher.Event:
 			if strings.HasSuffix(e.Name, "tmp") {
-				return
+				continue
 			}
 			if is(e, inotify.InCloseWrite) || is(e, inotify.InMovedTo) {
 				createFile(watcher, db, user, e.Name)
