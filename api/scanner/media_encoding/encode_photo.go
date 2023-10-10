@@ -16,18 +16,16 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/vansante/go-ffprobe.v2"
 
-	_ "github.com/strukturag/libheif/go/heif"
-
 	"gorm.io/gorm"
 )
 
 var thumbFilter = map[models.ThumbnailFilter]imaging.ResampleFilter{
-	models.ThumbnailFilterNearestNeighbor:  imaging.NearestNeighbor,
-	models.ThumbnailFilterBox:  imaging.Box,
-	models.ThumbnailFilterLinear:	imaging.Linear,
-	models.ThumbnailFilterMitchellNetravali:	imaging.MitchellNetravali,
-	models.ThumbnailFilterCatmullRom:	imaging.CatmullRom,
-	models.ThumbnailFilterLanczos:	imaging.Lanczos,
+	models.ThumbnailFilterNearestNeighbor:   imaging.NearestNeighbor,
+	models.ThumbnailFilterBox:               imaging.Box,
+	models.ThumbnailFilterLinear:            imaging.Linear,
+	models.ThumbnailFilterMitchellNetravali: imaging.MitchellNetravali,
+	models.ThumbnailFilterCatmullRom:        imaging.CatmullRom,
+	models.ThumbnailFilterLanczos:           imaging.Lanczos,
 }
 
 func EncodeThumbnail(db *gorm.DB, inputPath string, outputPath string) (*media_utils.PhotoDimensions, error) {
