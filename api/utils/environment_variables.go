@@ -44,6 +44,7 @@ const (
 // ShootSoftware relates
 const (
 	EnvShootSoftware EnvironmentVariable = "ShootSoftware"
+	EnvFinalDir      EnvironmentVariable = "FinalDir"
 )
 
 // GetName returns the name of the environment variable itself

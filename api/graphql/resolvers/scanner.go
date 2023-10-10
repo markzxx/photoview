@@ -113,6 +113,9 @@ const finalDir = "/data/文档同步/双向同步/客户照片修图"
 func (r *mutationResolver) MakeFinalDir(ctx context.Context, albumID int) (int, error) {
 	album := r.findSonOfRoot(ctx, albumID)
 	newRootPath := path.Join(finalDir, album.Title)
+	if utils.EnvFinalDir.GetValue() != "" {
+		newRootPath = path.Join(utils.EnvFinalDir.GetValue(), album.Title)
+	}
 	dirContent, _ := ioutil.ReadDir(album.Path)
 	if "yingjiang" == utils.EnvShootSoftware.GetValue() {
 		for _, item := range dirContent {
