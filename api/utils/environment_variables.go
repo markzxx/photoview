@@ -41,6 +41,11 @@ const (
 	EnvDisableRawProcessing   EnvironmentVariable = "PHOTOVIEW_DISABLE_RAW_PROCESSING"
 )
 
+// ShootSoftware relates
+const (
+	EnvShootSoftware EnvironmentVariable = "ShootSoftware"
+)
+
 // GetName returns the name of the environment variable itself
 func (v EnvironmentVariable) GetName() string {
 	return string(v)

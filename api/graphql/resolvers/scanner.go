@@ -6,7 +6,6 @@ import (
 	"github.com/photoview/photoview/api/utils"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"time"
@@ -112,28 +111,48 @@ func (r *mutationResolver) MarkModify(ctx context.Context, modPath string) (int,
 const finalDir = "/data/文档同步/双向同步/客户照片修图"
 
 func (r *mutationResolver) MakeFinalDir(ctx context.Context, albumID int) (int, error) {
-	album := &models.Album{}
-	db := r.DB(ctx)
-	db.First(album, albumID)
-	if album.Title == "精修图片" {
-		parent := &models.Album{}
-		db.First(parent, album.ParentAlbumID)
-		album = parent
-		log.Println("find parent dir", album.Title)
-	}
+	album := r.findSonOfRoot(ctx, albumID)
 	newRootPath := path.Join(finalDir, album.Title)
-	newOriginPath := path.Join(newRootPath, "原图")
-	os.MkdirAll(newOriginPath, os.ModePerm)
 	dirContent, _ := ioutil.ReadDir(album.Path)
-	for _, item := range dirContent {
-		if item.IsDir() {
-			CopyDir(path.Join(album.Path, item.Name()), path.Join(newRootPath, item.Name()))
-		} else {
-			CopyFile(path.Join(album.Path, item.Name()), path.Join(newOriginPath, item.Name()))
+	if "yingjiang" == utils.EnvShootSoftware.GetValue() {
+		for _, item := range dirContent {
+			if item.Name() == "temp" || item.Name() == "原片" || item.Name() == "精修" {
+				continue
+			}
+			if item.IsDir() {
+				newDirName := item.Name()
+				if newDirName == "成品" {
+					newDirName = "原图"
+				}
+				_ = CopyDir(path.Join(album.Path, item.Name()), path.Join(newRootPath, newDirName))
+			} else {
+				_ = CopyFile(path.Join(album.Path, item.Name()), path.Join(newRootPath, item.Name()))
+			}
+		}
+	} else {
+		newOriginPath := path.Join(newRootPath, "原图")
+		_ = os.MkdirAll(newOriginPath, os.ModePerm)
+		for _, item := range dirContent {
+			if item.IsDir() {
+				_ = CopyDir(path.Join(album.Path, item.Name()), path.Join(newRootPath, item.Name()))
+			} else {
+				_ = CopyFile(path.Join(album.Path, item.Name()), path.Join(newOriginPath, item.Name()))
+			}
 		}
 	}
 
 	return 0, nil
+}
+
+func (r *mutationResolver) findSonOfRoot(ctx context.Context, albumID int) *models.Album {
+	album := &models.Album{}
+	db := r.DB(ctx)
+	db.First(album, albumID)
+	parents, _ := album.GetParents(db, nil)
+	if len(parents) == 1 {
+		return album
+	}
+	return parents[1]
 }
 
 func (r *mutationResolver) MarkRetouchFile(ctx context.Context, albumID int) (int, error) {
