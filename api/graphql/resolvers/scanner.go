@@ -149,9 +149,6 @@ func (r *mutationResolver) findSonOfRoot(ctx context.Context, albumID int) *mode
 	db := r.DB(ctx)
 	db.First(album, albumID)
 	parents, _ := album.GetParents(db, nil)
-	if len(parents) == 1 {
-		return album
-	}
 	return parents[1]
 }
 
