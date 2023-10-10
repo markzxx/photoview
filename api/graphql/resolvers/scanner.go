@@ -149,7 +149,10 @@ func (r *mutationResolver) findSonOfRoot(ctx context.Context, albumID int) *mode
 	db := r.DB(ctx)
 	db.First(album, albumID)
 	parents, _ := album.GetParents(db, nil)
-	return parents[1]
+	if len(parents) < 2 {
+		return album
+	}
+	return parents[len(parents)-2]
 }
 
 func (r *mutationResolver) MarkRetouchFile(ctx context.Context, albumID int) (int, error) {
