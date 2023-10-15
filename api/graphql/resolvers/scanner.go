@@ -117,30 +117,13 @@ func (r *mutationResolver) MakeFinalDir(ctx context.Context, albumID int) (int, 
 		newRootPath = path.Join(utils.EnvFinalDir.GetValue(), album.Title)
 	}
 	dirContent, _ := ioutil.ReadDir(album.Path)
-	if "yingjiang" == utils.EnvShootSoftware.GetValue() {
-		for _, item := range dirContent {
-			if item.Name() == "temp" || item.Name() == "原片" || item.Name() == "精修" {
-				continue
-			}
-			if item.IsDir() {
-				newDirName := item.Name()
-				if newDirName == "成品" {
-					newDirName = "原图"
-				}
-				_ = CopyDir(path.Join(album.Path, item.Name()), path.Join(newRootPath, newDirName))
-			} else {
-				_ = CopyFile(path.Join(album.Path, item.Name()), path.Join(newRootPath, item.Name()))
-			}
-		}
-	} else {
-		newOriginPath := path.Join(newRootPath, "原图")
-		_ = os.MkdirAll(newOriginPath, os.ModePerm)
-		for _, item := range dirContent {
-			if item.IsDir() {
-				_ = CopyDir(path.Join(album.Path, item.Name()), path.Join(newRootPath, item.Name()))
-			} else {
-				_ = CopyFile(path.Join(album.Path, item.Name()), path.Join(newOriginPath, item.Name()))
-			}
+	newOriginPath := path.Join(newRootPath, "原图")
+	_ = os.MkdirAll(newOriginPath, os.ModePerm)
+	for _, item := range dirContent {
+		if item.IsDir() {
+			_ = CopyDir(path.Join(album.Path, item.Name()), path.Join(newRootPath, item.Name()))
+		} else {
+			_ = CopyFile(path.Join(album.Path, item.Name()), path.Join(newOriginPath, item.Name()))
 		}
 	}
 
