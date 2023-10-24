@@ -11,7 +11,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"runtime/debug"
 	"strconv"
 	"strings"
@@ -46,7 +45,7 @@ func InitFsNotify(db *gorm.DB) error {
 	}
 
 	go func() {
-		for i := 0; i < runtime.NumCPU()*2; i++ {
+		for i := 0; i < 2; i++ {
 			go worker(watcher, db, user)
 		}
 	}()
