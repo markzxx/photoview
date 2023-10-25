@@ -87,18 +87,19 @@ func (a *Album) Thumbnail(db *gorm.DB) (*Media, error) {
 
 	if a.CoverID == nil {
 		if err := db.Raw(`
-			WITH recursive sub_albums AS (
-				SELECT * FROM albums AS root WHERE id = ?
-				UNION ALL
-				SELECT child.* FROM albums AS child JOIN sub_albums ON child.parent_album_id = sub_albums.id
-			)
-
-			SELECT * FROM media WHERE media.album_id IN (
-				SELECT id FROM sub_albums
-			) AND media.id IN (
-				SELECT media_id FROM media_urls WHERE media_urls.media_id = media.id
-			) ORDER BY date_shot DESC LIMIT 1
-		`, a.ID).Find(&media).Error; err != nil {
+			SELECT media.* 
+			FROM media 
+			JOIN (
+					SELECT a1.id FROM albums AS a1 WHERE a1.id = ?
+					UNION
+					SELECT a2.id FROM albums AS a2 
+					INNER JOIN albums AS a1 ON a2.parent_album_id = a1.id
+					WHERE a1.id = ?
+				) sub_albums ON media.album_id = sub_albums.id 
+			JOIN media_urls ON media_urls.media_id = media.id 
+			ORDER BY media.id DESC
+			LIMIT 1
+		`, a.ID, a.ID).Find(&media).Error; err != nil {
 			return nil, err
 		}
 	} else {
