@@ -87,7 +87,7 @@ func createFile(watcher *inotify.Watcher, db *gorm.DB, user *models.User, filePa
 	dir := path.Dir(filePath)
 	log.Println("Create file", filePath)
 	// 删除多余文件
-	os.Remove(utils.SwitchBolanghao(filePath))
+	os.Remove(utils.SwitchSymbol(filePath))
 
 	if _, err := os.Stat(filePath); err != nil {
 		log.Println("Create error not exist,", filePath)
@@ -100,14 +100,14 @@ func createFile(watcher *inotify.Watcher, db *gorm.DB, user *models.User, filePa
 		return
 	}
 	db.Model(&album).Update("last_modify_time", time.Now().UTC().Unix())
-	media, ok, _ := ScanMedia(db, filePath, album.ID, scanner_cache.MakeAlbumCache())
+	media, ok, err := ScanMedia(db, filePath, album.ID, scanner_cache.MakeAlbumCache())
 	if ok {
 		err := ProcessSingleMedia(db, media, &album)
 		if err != nil {
 			log.Printf("ProcessSingleMedia path[%v] err=[%v]\n", filePath, err)
 		}
 	} else {
-		log.Printf("ScanMedia path=[%v] ok=[%v]\n", filePath, ok)
+		log.Printf("ScanMedia path=[%v] ok=[%v], err=[%v]\n", filePath, ok, err)
 	}
 	result := db.First(media)
 	if result.Error != nil {
@@ -143,7 +143,7 @@ func deleteFile(watcher *inotify.Watcher, db *gorm.DB, user *models.User, filePa
 	defer deferFunc()
 	log.Println("delete file", filePath)
 	var media models.Media
-	result := db.Where("path_hash = ?", models.MD5Hash(utils.RemoveBolanghao(filePath))).First(&media)
+	result := db.Where("path_hash = ?", models.MD5Hash(utils.RemoveSymbol(filePath))).First(&media)
 	if result.Error != nil {
 		return
 	}

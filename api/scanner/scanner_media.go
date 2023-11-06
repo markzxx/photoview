@@ -21,7 +21,7 @@ func ScanMedia(tx *gorm.DB, mediaPath string, albumId int, cache *scanner_cache.
 	{
 		var media []*models.Media
 
-		result := tx.Where("path_hash = ?", models.MD5Hash(utils.RemoveBolanghao(mediaPath))).Find(&media)
+		result := tx.Where("path_hash = ?", models.MD5Hash(utils.RemoveSymbol(mediaPath))).Find(&media)
 
 		if result.Error != nil {
 			return nil, false, errors.Wrap(result.Error, "scan media fetch from database")

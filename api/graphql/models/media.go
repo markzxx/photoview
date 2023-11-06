@@ -39,7 +39,7 @@ func (Media) TableName() string {
 
 func (m *Media) BeforeSave(tx *gorm.DB) error {
 	// Update path hash
-	m.PathHash = MD5Hash(utils.RemoveBolanghao(m.Path))
+	m.PathHash = MD5Hash(utils.RemoveSymbol(m.Path))
 
 	return nil
 }
@@ -142,7 +142,7 @@ func (p *MediaURL) CachedPath() (string, error) {
 			cachedPath = p.Media.Path
 			_, err := os.Stat(cachedPath)
 			if err != nil {
-				cachedPath = utils.SwitchBolanghao(cachedPath)
+				cachedPath = utils.SwitchSymbol(cachedPath)
 			}
 		}
 	} else {

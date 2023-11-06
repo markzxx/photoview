@@ -152,9 +152,9 @@ func (r *mutationResolver) MarkRetouchFile(ctx context.Context, albumID int) (in
 		var favorite models.UserMediaData
 		db.Where("media_id = ?", media.ID).First(&favorite)
 		if favorite.Favorite {
-			os.Rename(media.Path, utils.RemoveBolanghao(media.Path))
+			os.Rename(media.Path, utils.AddSymbol(media.Path))
 		} else {
-			os.Rename(media.Path, utils.AddBolanghao(media.Path))
+			os.Rename(media.Path, utils.RemoveSymbol(media.Path))
 		}
 	}
 

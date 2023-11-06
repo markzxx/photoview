@@ -95,26 +95,28 @@ func IsDirSymlink(path string) (bool, error) {
 	return false, nil
 }
 
-func RemoveBolanghao(mediaPath string) string {
+var symbol = "S-"
+
+func RemoveSymbol(mediaPath string) string {
 	dir := path.Dir(mediaPath)
 	base := path.Base(mediaPath)
-	return path.Join(dir, strings.TrimPrefix(base, "~"))
+	return path.Join(dir, strings.TrimPrefix(base, symbol))
 }
 
-func AddBolanghao(mediaPath string) string {
+func AddSymbol(mediaPath string) string {
 	dir := path.Dir(mediaPath)
 	base := path.Base(mediaPath)
-	if !strings.HasPrefix(base, "~") {
-		return path.Join(dir, "~"+base)
+	if !strings.HasPrefix(base, symbol) {
+		return path.Join(dir, symbol+base)
 	}
 	return mediaPath
 }
 
-func SwitchBolanghao(mediaPath string) string {
+func SwitchSymbol(mediaPath string) string {
 	dir := path.Dir(mediaPath)
 	base := path.Base(mediaPath)
-	if strings.HasPrefix(base, "~") {
-		return path.Join(dir, strings.TrimPrefix(base, "~"))
+	if strings.HasPrefix(base, symbol) {
+		return path.Join(dir, strings.TrimPrefix(base, symbol))
 	}
-	return path.Join(dir, "~"+base)
+	return path.Join(dir, symbol+base)
 }
