@@ -7,7 +7,7 @@ import { getMyAlbums } from './__generated__/getMyAlbums'
 const getAlbumsQuery = gql`
   query getMyAlbums {
     myAlbums(
-      order: { order_by: "title", order_direction: DESC }
+      order: { order_by: "created_at", order_direction: DESC }
       paginate: { limit: 50 }
       onlyRoot: true
       showEmpty: true
