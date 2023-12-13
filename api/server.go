@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/photoview/photoview/api/scanner"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -36,7 +37,8 @@ func main() {
 		log.Panic(err)
 	}
 	defer logFile.Close()
-	log.SetOutput(logFile)
+	multiWriter := io.MultiWriter(os.Stderr, logFile)
+	log.SetOutput(multiWriter)
 	log.Println("Starting Photoview...")
 
 	if err := godotenv.Load(); err != nil {
